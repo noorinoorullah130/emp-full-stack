@@ -1,0 +1,41 @@
+.settings {
+    padding: 2rem;
+    margin: 75px 25px 25px 275px;
+    background-color: #ffffff;
+    border-radius: 1rem;
+    box-shadow: 0 2px 15px rgba(0, 0, 0, 0.08);
+    height: calc(100vh - 100px);
+    display: flex;
+    flex-direction: column;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow: hidden;
+}
+
+.settings form {
+    width: 100%;
+    margin: 0 auto;
+}
+
+.settings form input {
+    width: 75%;
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 1rem;
+}
+
+.settings form button {
+    width: 75%;
+    padding: 12px;
+    background: #3f51b5;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.settings form button:hover {
+    background: #354497;
+}
