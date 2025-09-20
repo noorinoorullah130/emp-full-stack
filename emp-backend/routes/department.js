@@ -9,7 +9,7 @@ const {
 const router = express.Router();
 
 router.post("/", verifyToken, addNewDpt);
-router.get("/", getAllDpts);
+router.get("/", verifyToken, getAllDpts);
 router.put("/:id", verifyToken, updateDpt);
 router.delete("/:id", verifyToken, deleteDpt);
 

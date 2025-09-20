@@ -3,7 +3,7 @@ const Employee = require("../models/employee");
 
 const addNewDpt = async (req, res) => {
     try {
-        const { dptName, dptManager } = req.body;
+        const { dptName, dptManager, directorate } = req.body;
 
         if (!dptName || !dptManager) {
             return res
@@ -23,6 +23,7 @@ const addNewDpt = async (req, res) => {
         const newDpt = new Department({
             dptName,
             dptManager,
+            directorate
         });
 
         await newDpt.save();

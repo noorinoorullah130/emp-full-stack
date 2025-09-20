@@ -4,7 +4,7 @@ import "./Header.css";
 import { getTokenAndRole } from "../../utils/auth";
 
 const Header = () => {
-    const { role, username } = getTokenAndRole();
+    const { directorate, role, username } = getTokenAndRole();
 
     const splitUsername = username.split(" ");
     const userFirstName = splitUsername[0].charAt(0);
@@ -21,7 +21,10 @@ const Header = () => {
                         <span className="hamburger"></span>
                     </button>
                     <h1 className="page-title">
-                        Human Resource Management System
+                        Human Resource Management System -{" "}
+                        {role === "admin"
+                            ? "Admin"
+                            : `Directorate of ${directorate}`}
                     </h1>
                 </div>
 

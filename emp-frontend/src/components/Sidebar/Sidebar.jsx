@@ -31,22 +31,22 @@ const Sidebar = () => {
                         </NavLink>
                     </li>
 
-                    <li>
-                        <NavLink to="alldirectorates">
-                            <FaBuildingUser className="icon" />
-                            <span>All Directorates</span>
-                        </NavLink>
-                    </li>
-
-                    <li>
-                        <NavLink to="newdirectorate">
-                            <FaBuildingUser className="icon" />
-                            <span>New Directorate</span>
-                        </NavLink>
-                    </li>
-
                     {role === "admin" && (
                         <>
+                            <li>
+                                <NavLink to="alldirectorates">
+                                    <FaBuildingUser className="icon" />
+                                    <span>All Directorates</span>
+                                </NavLink>
+                            </li>
+
+                            <li>
+                                <NavLink to="newdirectorate">
+                                    <FaBuildingUser className="icon" />
+                                    <span>New Directorate</span>
+                                </NavLink>
+                            </li>
+
                             <li>
                                 <NavLink to="allusers">
                                     <FaUsers className="icon" />

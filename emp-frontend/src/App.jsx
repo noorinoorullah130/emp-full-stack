@@ -38,9 +38,20 @@ const App = () => {
                     />
                     <Route
                         path="alldirectorates"
-                        element={<AllDirectorates />}
+                        element={
+                            <RoleProtectedRoute allowedRoles={["admin"]}>
+                                <AllDirectorates />
+                            </RoleProtectedRoute>
+                        }
                     />
-                    <Route path="newdirectorate" element={<NewDirectorate />} />
+                    <Route
+                        path="newdirectorate"
+                        element={
+                            <RoleProtectedRoute allowedRoles={["admin"]}>
+                                <NewDirectorate />
+                            </RoleProtectedRoute>
+                        }
+                    />
                     <Route
                         path="allusers"
                         element={

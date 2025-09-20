@@ -7,10 +7,12 @@ const {
     updateDirectorate,
     deleteDirectorate,
 } = require("../controllers/directorate");
+const verifyToken = require("../middleware/verifyToken");
+const checkRole = require("../middleware/checkRole");
 
-router.post("/", addNewDirectorate);
-router.get("/", getAllDirectorates);
-router.put("/:id", updateDirectorate);
-router.delete("/:id", deleteDirectorate);
+router.post("/", verifyToken, checkRole, addNewDirectorate);
+router.get("/", verifyToken, checkRole, getAllDirectorates);
+router.put("/:id", verifyToken, checkRole, updateDirectorate);
+router.delete("/:id", verifyToken, checkRole, deleteDirectorate);
 
 module.exports = router;

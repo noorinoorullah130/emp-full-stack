@@ -8,8 +8,11 @@ const employeeSchema = new mongoose.Schema(
         step: { type: Number, required: true, min: 1, max: 5 },
         salary: { type: Number },
         experience: { type: Number, required: true },
-        department: { type: String, required: true },
-        directorate: { type: String, required: true },
+        department: { type: mongoose.Schema.Types.ObjectId, ref: "Department" },
+        directorate: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Directorate",
+        },
         idNumber: {
             type: String,
             required: true,

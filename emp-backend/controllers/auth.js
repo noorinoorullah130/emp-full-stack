@@ -1,4 +1,5 @@
 const User = require("../models/user");
+const Directorate = require("../models/directorate");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
@@ -25,10 +26,14 @@ const login = async (req, res) => {
         expiresIn: "7d",
     });
 
+    const dirName = await Directorate.findById(user.directorate).select(
+        "dirName"
+    );
+
     res.status(200).json({
         token,
         username: user.name,
-        directorate: user.directorate,
+        directorate: [user.directorate, dirName],
         role: user.role,
     });
 };

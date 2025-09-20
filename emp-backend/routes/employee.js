@@ -10,8 +10,8 @@ const {
 
 const verifyToken = require("../middleware/verifyToken");
 
-router.post("/", addNewEmployee);
-router.get("/", getAllEmployees);
+router.post("/", verifyToken, addNewEmployee);
+router.get("/", verifyToken, getAllEmployees);
 router.put("/:id", verifyToken, updateEmployee);
 router.delete("/:id", verifyToken, deleteEmployee);
 

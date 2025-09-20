@@ -34,12 +34,14 @@ const Login = () => {
             saveTokenAndRole(
                 response.data.token,
                 response.data.role,
-                response.data.username
+                response.data.username,
+                response.data.directorate[1]?.dirName
             );
 
             navigate("/app");
         } catch (error) {
             toast.error(error.response?.data?.message || "Login failed!");
+            console.log(error);
         } finally {
             setLoading(false);
         }
