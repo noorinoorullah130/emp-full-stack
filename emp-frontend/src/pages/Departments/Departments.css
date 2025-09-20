@@ -77,12 +77,15 @@
 
 /* Action Buttons */
 .action-buttons {
-    display: flex;
+    padding: 0.875rem 1.25rem;
+    color: #4a5568;
+    border-bottom: 1px solid #edf2f7;
+    vertical-align: middle;
     gap: 0.5rem;
 }
 
-.view-btn,
-.edit-btn {
+.edit-btn,
+.delete-btn {
     padding: 0.5rem 0.75rem;
     border-radius: 0.375rem;
     font-size: 0.85rem;
@@ -92,21 +95,22 @@
     border: none;
 }
 
-.view-btn {
+.edit-btn {
     background-color: #ebf8ff;
     color: #3182ce;
+    margin-right: 10px;
 }
 
-.view-btn:hover {
+.edit-btn:hover {
     background-color: #bee3f8;
 }
 
-.edit-btn {
+.delete-btn {
     background-color: #fff5f5;
     color: #e53e3e;
 }
 
-.edit-btn:hover {
+.delete-btn:hover {
     background-color: #fed7d7;
 }
 

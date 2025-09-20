@@ -2,8 +2,49 @@ import React, { useState } from "react";
 
 import { FaUser, FaLock } from "react-icons/fa";
 import "./Login.css";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+
+import api from "../../utils/api";
+import { saveTokenAndRole } from "../../utils/auth";
 
 const Login = () => {
+    const [form, setForm] = useState({
+        email: "",
+        password: "",
+    });
+
+    const [loading, setLoading] = useState(false);
+
+    const navigate = useNavigate();
+
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setForm((prev) => {
+            return { ...prev, [name]: value };
+        });
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setLoading(true);
+
+        try {
+            const response = await api.post("/auth", form);
+            saveTokenAndRole(
+                response.data.token,
+                response.data.role,
+                response.data.username
+            );
+
+            navigate("/app");
+        } catch (error) {
+            toast.error(error.response?.data?.message || "Login failed!");
+        } finally {
+            setLoading(false);
+        }
+    };
+
     return (
         <div className="login-container">
             <div className="login-wrapper">
@@ -18,13 +59,17 @@ const Login = () => {
                         <p>Enter your credentials to access the system</p>
                     </div>
 
-                    <form>
+                    <form onSubmit={handleSubmit}>
                         <div className="input-group">
                             <FaUser className="input-icon" />
                             <input
                                 type="email"
                                 placeholder="Email Address"
+                                name="email"
+                                value={form.email}
+                                onChange={(e) => handleChange(e)}
                                 required
+                                disabled={loading}
                             />
                         </div>
 
@@ -33,7 +78,11 @@ const Login = () => {
                             <input
                                 type="password"
                                 placeholder="Password"
+                                name="password"
+                                value={form.password}
+                                onChange={(e) => handleChange(e)}
                                 required
+                                disabled={loading}
                             />
                         </div>
 
@@ -41,8 +90,19 @@ const Login = () => {
                             <a href="#">Forgot password?</a>
                         </div>
 
-                        <button type="submit" className="login-btn">
-                            Login
+                        <button
+                            type="submit"
+                            className="login-btn"
+                            disabled={loading}
+                        >
+                            {loading ? (
+                                <>
+                                    <span className="spinner"></span> Logging
+                                    in...
+                                </>
+                            ) : (
+                                "Login"
+                            )}
                         </button>
                     </form>
                 </div>

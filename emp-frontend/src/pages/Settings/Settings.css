@@ -23,6 +23,21 @@
     margin-bottom: 1rem;
 }
 
+.settings form select {
+    width: 75%;
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 1rem;
+    padding: 12px 12px 12px 40px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 0.95rem;
+}
+
+.settings form select option {
+    padding: 12px 12px 12px 40px;
+}
+
 .settings form button {
     width: 75%;
     padding: 12px;

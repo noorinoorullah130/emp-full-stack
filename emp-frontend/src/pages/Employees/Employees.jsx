@@ -2,6 +2,7 @@ import React from "react";
 
 // Now the css working on departments css file
 import "./Employees.css";
+import Pagination from "../../components/Pagination/Pagination";
 
 const Employees = () => {
     const employees = [
@@ -11,7 +12,7 @@ const Employees = () => {
             grade: 4,
             step: 1,
             salary: 10000,
-            experiance: 5 + "Y",
+            experience: 5 + "Y",
         },
         {
             name: "Abdulrahman",
@@ -19,7 +20,7 @@ const Employees = () => {
             grade: 3,
             step: 1,
             salary: 12000,
-            experiance: 3 + "Y",
+            experience: 3 + "Y",
         },
         {
             name: "Khan Mohammad",
@@ -27,7 +28,7 @@ const Employees = () => {
             grade: 2,
             step: 5,
             salary: 18000,
-            experiance: 8 + "Y",
+            experience: 8 + "Y",
         },
     ];
 
@@ -47,7 +48,7 @@ const Employees = () => {
                         <th>Grade</th>
                         <th>Step</th>
                         <th>Salary</th>
-                        <th>Experiance</th>
+                        <th>Experience</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
@@ -60,32 +61,17 @@ const Employees = () => {
                             <td>{emp.grade}</td>
                             <td>{emp.step}</td>
                             <td>{emp.salary}</td>
-                            <td>{emp.experiance}</td>
+                            <td>{emp.experience}</td>
                             <td className="action-buttons">
-                                <button className="view-btn">View</button>
                                 <button className="edit-btn">Edit</button>
+                                <button className="delete-btn">delete</button>
                             </td>
                         </tr>
                     ))}
                 </tbody>
             </table>
 
-            <footer className="pagination-footer">
-                <button>Prev</button>
-                <p>Page 1 of 10</p>
-                <button>Next</button>
-
-                <select className="items-per-page">
-                    <option value="" disabled>
-                        10
-                    </option>
-                    <option value="5">5</option>
-                    <option value="10">10</option>
-                    <option value="20">20</option>
-                    <option value="50">50</option>
-                    <option value="100">100</option>
-                </select>
-            </footer>
+            <Pagination />
         </div>
     );
 };

@@ -1,5 +1,6 @@
 .newemployee,
-.new-user {
+.new-user,
+.new-directorate {
     padding: 2rem;
     margin: 75px 25px 25px 275px;
     background-color: #ffffff;
@@ -8,20 +9,24 @@
 }
 
 .newemployee form,
-.new-user form {
+.new-user form,
+.new-directorate form {
     width: 100%;
     margin: 0 auto;
 }
 
 .newemployee form input,
-.new-user form input {
+.new-user form input,
+.new-directorate form input {
     width: 75%;
     display: flex;
     flex-direction: column;
     margin-bottom: 1rem;
 }
 
-.new-user form select {
+.new-user form select,
+.newemployee form select,
+.new-directorate form select {
     width: 75%;
     display: flex;
     flex-direction: column;
@@ -32,12 +37,15 @@
     font-size: 0.95rem;
 }
 
-.new-user form select option {
+.new-user form select option,
+.newemployee form select option,
+.new-directorate form select option {
     padding: 12px 12px 12px 40px;
 }
 
 .newemployee form button,
-.new-user form button {
+.new-user form button,
+.new-directorate form button {
     width: 75%;
     padding: 12px;
     background: #3f51b5;
@@ -51,6 +59,7 @@
 }
 
 .newemployee form button:hover,
-.new-user form button:hover {
+.new-user form button:hover,
+.new-directorate form button:hover {
     background: #354497;
 }

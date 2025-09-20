@@ -1,7 +1,16 @@
 import React from "react";
+
 import "./Header.css";
+import { getTokenAndRole } from "../../utils/auth";
 
 const Header = () => {
+    const { role, username } = getTokenAndRole();
+
+    const splitUsername = username.split(" ");
+    const userFirstName = splitUsername[0].charAt(0);
+    const userLastName = splitUsername[1] ? splitUsername[1].charAt(0) : "";
+    const userInitials = userFirstName + userLastName;
+
     return (
         <header className="main-header">
             <div className="header-content">
@@ -18,9 +27,9 @@ const Header = () => {
 
                 <div className="header-right">
                     <div className="user-profile">
-                        <div className="avatar">JD</div>
-                        <span className="username">John Doe</span>
-                        <span className="user-role">Admin</span>
+                        <div className="avatar">{userInitials}</div>
+                        <span className="username">{username}</span>
+                        <span className="user-role">{role}</span>
                     </div>
                 </div>
             </div>

@@ -1,5 +1,6 @@
 import React from "react";
 import "./Departments.css";
+import Pagination from "../../components/Pagination/Pagination";
 
 const Departments = () => {
     const departments = [
@@ -24,27 +25,6 @@ const Departments = () => {
             employees: 18,
             budget: "$850K",
         },
-        {
-            id: 4,
-            name: "Research & Development",
-            manager: "Dr. Robert Smith",
-            employees: 15,
-            budget: "$2.1M",
-        },
-        {
-            id: 5,
-            name: "Operations",
-            manager: "David Wilson",
-            employees: 32,
-            budget: "$1.8M",
-        },
-        {
-            id: 6,
-            name: "Sales",
-            manager: "Jessica Brown",
-            employees: 28,
-            budget: "$2.3M",
-        },
     ];
 
     return (
@@ -61,7 +41,7 @@ const Departments = () => {
                         <th>Department Name</th>
                         <th>Manager</th>
                         <th>Employees</th>
-                        <th>Budget</th>
+                        <th>Total Salary</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
@@ -74,30 +54,15 @@ const Departments = () => {
                             <td>{dept.employees}</td>
                             <td>{dept.budget}</td>
                             <td className="action-buttons">
-                                <button className="view-btn">View</button>
                                 <button className="edit-btn">Edit</button>
+                                <button className="delete-btn">Delete</button>
                             </td>
                         </tr>
                     ))}
                 </tbody>
             </table>
 
-            <footer className="pagination-footer">
-                <button>Prev</button>
-                <p>Page 1 of 10</p>
-                <button>Next</button>
-
-                <select className="items-per-page">
-                    <option value="" disabled>
-                        10
-                    </option>
-                    <option value="5">5</option>
-                    <option value="10">10</option>
-                    <option value="20">20</option>
-                    <option value="50">50</option>
-                    <option value="100">100</option>
-                </select>
-            </footer>
+            <Pagination />
         </div>
     );
 };

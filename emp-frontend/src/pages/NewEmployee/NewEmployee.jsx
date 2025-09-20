@@ -34,7 +34,7 @@ const NewEmployee = () => {
                     placeholder="Enter Grade"
                     required
                     min={1}
-                    max={6}
+                    max={4}
                 />
 
                 <label htmlFor="step">Step:</label>
@@ -47,13 +47,27 @@ const NewEmployee = () => {
                     max={5}
                 />
 
-                <label htmlFor="experiance">Experiance:</label>
+                <label htmlFor="experience">Experience:</label>
                 <input
                     type="number"
-                    id="experiance"
-                    placeholder="Enter Experiance by number of years"
+                    id="experience"
+                    placeholder="Enter Experience by number of years"
                     required
                     min={0}
+                />
+
+                <label htmlFor="department">Department:</label>
+                <select>
+                    <option value="main office">Main Office</option>
+                    <option value="payroll">Payroll</option>
+                </select>
+
+                <label htmlFor="id-number">ID Number:</label>
+                <input
+                    type="text"
+                    id="id-number"
+                    placeholder="Enter ID Number"
+                    required
                 />
 
                 <button type="submit">Save</button>

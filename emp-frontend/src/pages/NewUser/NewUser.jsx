@@ -27,10 +27,31 @@ const NewUser = () => {
                     required
                 />
 
+                <label htmlFor="pasword">Password:</label>
+                <input
+                    type="pasword"
+                    id="pasword"
+                    placeholder="Enter Password"
+                    required
+                />
+
                 <label htmlFor="role">Role:</label>
-                <select>
-                    <option value="user">User</option>
-                    <option value="admin">Admin</option>
+                <select required>
+                    <option value="User">User</option>
+                    <option value="Admin">Admin</option>
+                </select>
+
+                <label htmlFor="directorate">Directorate:</label>
+                <select required>
+                    <option value="" disabled>
+                        Select Directorate
+                    </option>
+                    <option value="Binance and Budget">
+                        Finance and Budget
+                    </option>
+                    <option value="Logistics">Logistics</option>
+                    <option value="Precurements">Precurements</option>
+                    <option value="Human Resources">Human Resources</option>
                 </select>
 
                 <button type="submit">Save</button>
