@@ -46,7 +46,6 @@ const Dashboard = () => {
     const getDashboardDetails = async () => {
         const response = await api.get("/dashboard");
         const data = await response.data;
-        console.log(data);
         setDashboardDetails({
             totalDirectorates: data.totalDirectorates,
             totalEmployees: data.totalEmployees,
@@ -54,6 +53,7 @@ const Dashboard = () => {
             newEmpsInTheLastFiveDays: data.newEmpsInTheLastFiveDays,
             totalSalary: data.totalSalary,
         });
+        // console.log(data);
     };
 
     useEffect(() => {

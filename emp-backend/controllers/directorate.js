@@ -26,6 +26,9 @@ const addNewDirectorate = async (req, res) => {
 
         await newDirectorate.save();
 
+        console.log(req.user);
+        console.log(newDirectorate);
+
         res.status(201).json({
             message: "New Directorate Added!",
             newDirectorate,
@@ -47,13 +50,16 @@ const getAllDirectorates = async (req, res) => {
             .limit(limit)
             .skip(skip);
 
+        if (!allDirectorates)
+            return res.status(404).json({ message: "No data availabel!" });
+
         const totalDirectorates = await Directorate.countDocuments();
         const totalPages = Math.ceil(totalDirectorates / limit);
 
         const empPerDirectorate = await Promise.all(
             allDirectorates.map(async (dir) => {
                 const allEmployees = await Employee.find({
-                    directorate: dir.dirName,
+                    directorate: dir._id,
                 });
 
                 const employeeCountPerDirectorate = allEmployees.length;

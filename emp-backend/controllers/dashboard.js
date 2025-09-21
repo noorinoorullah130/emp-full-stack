@@ -7,8 +7,6 @@ const getDashboardInformation = async (req, res) => {
     const fiveDaysAgo = new Date();
     fiveDaysAgo.setDate(now.getDate() - 5);
 
-    console.log(req);
-
     try {
         if (req.user.role.includes("admin")) {
             // For Admin

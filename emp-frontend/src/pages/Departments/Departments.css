@@ -36,6 +36,7 @@
     border-spacing: 0;
     font-size: 0.95rem;
     border: 1px solid #e2e8f0;
+    text-align: center;
 }
 
 /* Table Header */
@@ -48,7 +49,6 @@
 
 .departments-table th {
     padding: 1rem 1.25rem;
-    text-align: left;
     color: #4a5568;
     font-weight: 600;
     border-bottom: 1px solid #e2e8f0;
@@ -61,7 +61,7 @@
 }
 
 .departments-table td {
-    padding: 0.875rem 1.25rem;
+    padding: 8px;
     color: #4a5568;
     border-bottom: 1px solid #edf2f7;
     vertical-align: middle;
@@ -73,6 +73,11 @@
 
 .departments-table tr:hover td {
     background-color: #f8fafc;
+}
+
+.no-data {
+    text-align: center;
+    font-size: 2rem;
 }
 
 /* Action Buttons */

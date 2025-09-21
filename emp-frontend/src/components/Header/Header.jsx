@@ -23,7 +23,7 @@ const Header = () => {
                     <h1 className="page-title">
                         Human Resource Management System -{" "}
                         {role === "admin"
-                            ? "Admin"
+                            ? "All Directorates(Admin)"
                             : `Directorate of ${directorate}`}
                     </h1>
                 </div>

@@ -8,8 +8,8 @@ const addNewEmployee = async (req, res) => {
 
         const directorateOfNewEmployee = req.user.directorate;
 
-        console.log(req.user)
-        console.log(directorateOfNewEmployee)
+        console.log(req.user);
+        console.log(directorateOfNewEmployee);
 
         if (!name || !fName || !grade || !step || !idNumber) {
             return res
