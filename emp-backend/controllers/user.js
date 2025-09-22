@@ -43,7 +43,6 @@ const getAllUsers = async (req, res) => {
             .skip(skip);
 
         const totalUsers = await User.countDocuments();
-        const totalPages = Math.ceil(totalUsers / limit);
 
         res.status(200).json({
             allUsers,
@@ -51,7 +50,6 @@ const getAllUsers = async (req, res) => {
             limit,
             skip,
             totalUsers,
-            totalPages,
         });
     } catch (error) {
         res.status(500).json({ error: error.message });

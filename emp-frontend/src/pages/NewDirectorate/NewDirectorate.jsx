@@ -1,60 +1,87 @@
-import React, { useState } from "react";
-
-// Css works on new employees css file
+import React, { useContext, useEffect, useState } from "react";
 
 import api from "../../utils/api";
 import { toast } from "react-toastify";
+import AppContext from "../../context/appContext";
 
 const NewDirectorate = () => {
-    const [dirForm, setDirForm] = useState({
-        dirCode: "",
-        dirName: "",
-    });
-
+    const [dirForm, setDirForm] = useState({ dirCode: "", dirName: "" });
     const [loading, setLoading] = useState(false);
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        setLoading(true);
+    const { isEditing, setIsEditing, editingItem, setEditingItem } =
+        useContext(AppContext);
 
-        try {
-            const response = await api.post("/directorate", dirForm);
-            toast.success(response.data.message);
+    useEffect(() => {
+        if (isEditing && editingItem) {
             setDirForm({
-                dirCode: "",
-                dirName: "",
+                dirCode: editingItem.dirCode,
+                dirName: editingItem.dirName,
             });
-            setLoading(false);
-            console.log(response);
-        } catch (error) {
-            console.log(error);
-            console.log(error.response.data);
-            toast.error(error.response.data.message);
-        } finally {
-            setLoading(false);
         }
-    };
+    }, [isEditing, editingItem]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
         setDirForm((prev) => ({ ...prev, [name]: value }));
     };
 
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setLoading(true);
+
+        try {
+            let response;
+
+            if (isEditing && editingItem) {
+                response = await api.put(
+                    `/directorate/${editingItem.dirId}`,
+                    dirForm
+                );
+            } else {
+                response = await api.post("/directorate", dirForm);
+            }
+
+            toast.success(response?.data?.message);
+
+            setDirForm({ dirCode: "", dirName: "" });
+            setIsEditing(false);
+            setEditingItem(null);
+        } catch (error) {
+            toast.error(
+                error.response?.data?.message || "Something went wrong!"
+            );
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleCancel = () => {
+        setIsEditing(false);
+        setEditingItem(null);
+        setDirForm({ dirCode: "", dirName: "" });
+    };
+
     return (
         <div className="new-directorate">
             <div className="departments-header">
-                <h1>Add New Directorate</h1>
-                <p>Add new directorate and their details</p>
+                <h1>
+                    {isEditing ? "Edit Directorate" : "Add New Directorate"}
+                </h1>
+                <p>
+                    {isEditing
+                        ? "Edit directorate and their details"
+                        : "Add new directorate and their details"}
+                </p>
             </div>
 
             <form onSubmit={handleSubmit}>
                 <label htmlFor="dir-code">Directorate Code:</label>
                 <input
-                    type="Number"
+                    type="number"
                     id="dir-code"
                     name="dirCode"
                     value={dirForm.dirCode}
-                    onChange={(e) => handleChange(e)}
+                    onChange={handleChange}
                     disabled={loading}
                     placeholder="Enter Directorate Code"
                     required
@@ -66,15 +93,36 @@ const NewDirectorate = () => {
                     id="dir-name"
                     name="dirName"
                     value={dirForm.dirName}
-                    onChange={(e) => handleChange(e)}
+                    onChange={handleChange}
                     disabled={loading}
                     placeholder="Enter Directorate Name"
                     required
                 />
 
-                <button type="submit" disabled={loading}>
-                    {!loading ? "Save" : "Saving..."}
-                </button>
+                <div className="form-actions">
+                    <button
+                        type="submit"
+                        disabled={loading}
+                        className="submit-btn"
+                    >
+                        {!loading
+                            ? isEditing
+                                ? "Update"
+                                : "Save"
+                            : "Saving..."}
+                    </button>
+
+                    {isEditing && (
+                        <button
+                            type="button"
+                            onClick={handleCancel}
+                            disabled={loading}
+                            className="cancel-btn"
+                        >
+                            Cancel
+                        </button>
+                    )}
+                </div>
             </form>
         </div>
     );

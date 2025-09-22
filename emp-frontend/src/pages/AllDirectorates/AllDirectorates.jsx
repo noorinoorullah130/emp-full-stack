@@ -1,36 +1,32 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 
 import Pagination from "../../components/Pagination/Pagination";
 import api from "../../utils/api";
 import { toast } from "react-toastify";
+import AppContext from "../../context/appContext";
+import { useNavigate } from "react-router-dom";
 
 const AllDirectorates = () => {
     const [allDirectorates, setAllDirectorates] = useState([]);
     const [allDirectoratesDetail, setAllDirectoratesDetails] = useState([]);
-    const [loading, setLoading] = useState(false);
     const [currentPage, setCurrentPage] = useState(1);
     const [limit, setLimit] = useState(10);
-    const [totalPages, setTotalPages] = useState(1);
     const [totalDirectorates, setTotalDirectorates] = useState(0);
+    const [loading, setLoading] = useState(false);
+
+    const navigate = useNavigate();
+    const { setIsEditing, setEditingItem } = useContext(AppContext);
 
     const getAllDirectoratesData = async () => {
         try {
             setLoading(true);
-
             const response = await api.get("/directorate", {
-                params: {
-                    page: currentPage,
-                    limit,
-                },
+                params: { page: currentPage, limit },
             });
 
             const data = response.data;
-
-            console.log(data);
-
             setAllDirectorates(data.allDirectorates);
             setAllDirectoratesDetails(data.empPerDirectorate);
-            setTotalPages(data.totalPages);
             setTotalDirectorates(data.totalDirectorates);
         } catch (error) {
             toast.error(
@@ -60,6 +56,31 @@ const AllDirectorates = () => {
                 : 0,
         };
     });
+
+    const handleEdit = async (id, dir) => {
+        setIsEditing(true);
+        setEditingItem({
+            dirId: id,
+            dirCode: dir.dirCode,
+            dirName: dir.dirName,
+        });
+        navigate("/app/newdirectorate");
+    };
+
+    const handleDelete = async (id) => {
+        try {
+            setLoading(true);
+            const response = await api.delete(`/directorate/${id}`);
+            toast.success(response?.data?.message);
+            await getAllDirectoratesData();
+        } catch (error) {
+            toast.error(
+                error.response?.data?.message || "Failed to delete directorate!"
+            );
+        } finally {
+            setLoading(false);
+        }
+    };
 
     return (
         <div className="all-users">
@@ -103,8 +124,16 @@ const AllDirectorates = () => {
                                     {dir.totalSalaryPerDirectorate.toLocaleString()}
                                 </td>
                                 <td className="action-buttons">
-                                    <button className="edit-btn">Edit</button>
-                                    <button className="delete-btn">
+                                    <button
+                                        className="edit-btn"
+                                        onClick={() => handleEdit(dir._id, dir)}
+                                    >
+                                        Edit
+                                    </button>
+                                    <button
+                                        className="delete-btn"
+                                        onClick={() => handleDelete(dir._id)}
+                                    >
                                         Delete
                                     </button>
                                 </td>
@@ -119,8 +148,8 @@ const AllDirectorates = () => {
                 setCurrentPage={setCurrentPage}
                 limit={limit}
                 setLimit={setLimit}
-                totalPages={totalPages}
                 totalItems={totalDirectorates}
+                whichPage={"Directorates"}
             />
         </div>
     );

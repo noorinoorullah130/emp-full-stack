@@ -43,9 +43,9 @@
     padding: 12px 12px 12px 40px;
 }
 
-.newemployee form button,
-.new-user form button,
-.new-directorate form button {
+.newemployee form .submit-btn,
+.new-user form .submit-btn,
+.new-directorate form .submit-btn {
     width: 75%;
     padding: 12px;
     background: #3f51b5;
@@ -58,8 +58,24 @@
     transition: all 0.3s;
 }
 
+.newemployee form .cancel-btn,
+.new-user form .cancel-btn,
+.new-directorate .cancel-btn {
+    background-color: rgb(197, 0, 0);
+    margin-top: 1rem;
+        width: 75%;
+    padding: 12px;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
 .newemployee form button:hover,
 .new-user form button:hover,
 .new-directorate form button:hover {
-    background: #354497;
+    opacity: 0.8;
 }

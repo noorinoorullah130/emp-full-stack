@@ -16,7 +16,8 @@ const addNewDirectorate = async (req, res) => {
 
         if (isDirectorateExisted)
             return res.status(400).json({
-                message: "Directorate code or Name already existed!",
+                message:
+                    "Directorate already existed, See your directorate list!",
             });
 
         const newDirectorate = new Directorate({
@@ -54,7 +55,6 @@ const getAllDirectorates = async (req, res) => {
             return res.status(404).json({ message: "No data availabel!" });
 
         const totalDirectorates = await Directorate.countDocuments();
-        const totalPages = Math.ceil(totalDirectorates / limit);
 
         const empPerDirectorate = await Promise.all(
             allDirectorates.map(async (dir) => {
@@ -85,7 +85,6 @@ const getAllDirectorates = async (req, res) => {
             skip,
             totalDirectorates,
             empPerDirectorate,
-            totalPages,
         });
     } catch (error) {
         res.status(500).json({ error: error.message });
@@ -104,7 +103,7 @@ const updateDirectorate = async (req, res) => {
 
             if (isDirectorateExisted)
                 return res.status(400).json({
-                    message: `Directorate with code ${dirCode} and name ${dirName} already existed!`,
+                    message: `You cannot update because directorate already existed, See your directorate list!`,
                 });
         }
 
@@ -135,7 +134,7 @@ const deleteDirectorate = async (req, res) => {
             });
 
         res.status(200).json({
-            message: `Directorate with ID (${id}) successfully deleted!`,
+            message: `Directorate of ${deletedDirectorate.dirName} successfully deleted!`,
         });
     } catch (error) {
         res.status(500).json({ error: error.message });

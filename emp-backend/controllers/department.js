@@ -47,7 +47,6 @@ const getAllDpts = async (req, res) => {
             .skip(skip);
 
         const totalDpts = await Department.countDocuments();
-        const totalPages = Math.ceil(totalDpts / limit);
 
         const empPerDepartments = await Promise.all(
             allDpts.map(async (dpt) => {
@@ -78,7 +77,6 @@ const getAllDpts = async (req, res) => {
             allDpts,
             empPerDepartments,
             totalDpts,
-            totalPages,
         });
     } catch (error) {
         res.status(500).json({ error: error.message });

@@ -57,7 +57,6 @@ const getAllEmployees = async (req, res) => {
             .skip(skip);
 
         const totalEmployees = await Employee.countDocuments();
-        const totalPages = Math.ceil(totalEmployees / limit);
 
         res.status(200).json({
             page,
@@ -65,7 +64,6 @@ const getAllEmployees = async (req, res) => {
             skip,
             allEmployees,
             totalEmployees,
-            totalPages,
         });
     } catch (error) {
         res.status(500).json({ error: error.message });
