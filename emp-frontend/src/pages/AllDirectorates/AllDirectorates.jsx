@@ -5,6 +5,8 @@ import api from "../../utils/api";
 import { toast } from "react-toastify";
 import AppContext from "../../context/appContext";
 import { useNavigate } from "react-router-dom";
+import formatText from "../../utils/formatText";
+import ConfirmationBox from "../../components/ConfirmationBox/ConfirmationBox";
 
 const AllDirectorates = () => {
     const [allDirectorates, setAllDirectorates] = useState([]);
@@ -13,9 +15,15 @@ const AllDirectorates = () => {
     const [limit, setLimit] = useState(10);
     const [totalDirectorates, setTotalDirectorates] = useState(0);
     const [loading, setLoading] = useState(false);
+    const [deleteId, setDeleteId] = useState(null);
 
     const navigate = useNavigate();
-    const { setIsEditing, setEditingItem } = useContext(AppContext);
+    const {
+        showConfirmationBox,
+        setShowConfirmationBox,
+        setIsEditing,
+        setEditingItem,
+    } = useContext(AppContext);
 
     const getAllDirectoratesData = async () => {
         try {
@@ -67,10 +75,15 @@ const AllDirectorates = () => {
         navigate("/app/newdirectorate");
     };
 
-    const handleDelete = async (id) => {
+    const handleDelete = (id) => {
+        setDeleteId(id);
+        setShowConfirmationBox(true);
+    };
+
+    const confirmDelete = async () => {
         try {
             setLoading(true);
-            const response = await api.delete(`/directorate/${id}`);
+            const response = await api.delete(`/directorate/${deleteId}`);
             toast.success(response?.data?.message);
             await getAllDirectoratesData();
         } catch (error) {
@@ -79,6 +92,8 @@ const AllDirectorates = () => {
             );
         } finally {
             setLoading(false);
+            setDeleteId(null);
+            setShowConfirmationBox(false);
         }
     };
 
@@ -118,7 +133,7 @@ const AllDirectorates = () => {
                             <tr key={dir._id || i}>
                                 <td>{i + 1}</td>
                                 <td>{dir.dirCode}</td>
-                                <td>{dir.dirName}</td>
+                                <td>{formatText(dir.dirName).join(" ")}</td>
                                 <td>{dir.employeeCountPerDirectorate}</td>
                                 <td>
                                     {dir.totalSalaryPerDirectorate.toLocaleString()}
@@ -151,6 +166,13 @@ const AllDirectorates = () => {
                 totalItems={totalDirectorates}
                 whichPage={"Directorates"}
             />
+
+            {showConfirmationBox && (
+                <ConfirmationBox
+                    onConfirm={confirmDelete}
+                    onCancel={() => setShowConfirmationBox(false)}
+                />
+            )}
         </div>
     );
 };

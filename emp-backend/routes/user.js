@@ -9,10 +9,17 @@ const {
     getAllUsers,
     updateUser,
     deleteUser,
+    getAllDirectoratesForNewUser,
 } = require("../controllers/user");
 
 router.post("/", verifyToken, checkRole, addNewUser);
 router.get("/", verifyToken, checkRole, getAllUsers);
+router.get(
+    "/directoratesfornewuser",
+    verifyToken,
+    checkRole,
+    getAllDirectoratesForNewUser
+);
 router.put("/:id", verifyToken, checkRole, updateUser);
 router.delete("/:id", verifyToken, checkRole, deleteUser);
 

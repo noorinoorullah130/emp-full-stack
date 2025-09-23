@@ -2,9 +2,17 @@ const mongoose = require("mongoose");
 
 const dptSchema = new mongoose.Schema(
     {
-        dptName: { type: String, required: true },
-        dptManager: { type: String, required: true },
-        directorate: { type: mongoose.Schema.Types.ObjectId, ref: "Directorate" },
+        dptName: { type: String, required: true, trim: true, lowercase: true },
+        dptManager: {
+            type: String,
+            required: true,
+            trim: true,
+            lowercase: true,
+        },
+        directorate: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Directorate",
+        },
     },
     { timestamps: true }
 );

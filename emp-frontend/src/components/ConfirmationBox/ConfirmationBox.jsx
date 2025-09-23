@@ -1,9 +1,28 @@
-import React from 'react'
+import React from "react";
 
-const ConfirmationBox = () => {
-  return (
-    <div>ConfirmationBox</div>
-  )
-}
+import "./ConfirmationBox.css";
+import { FaExclamationTriangle } from "react-icons/fa";
 
-export default ConfirmationBox
+const ConfirmationBox = ({ onConfirm, onCancel }) => {
+    return (
+        <div className="overlay">
+            <div className="confirmation-box">
+                <FaExclamationTriangle
+                    style={{ color: "orange", fontSize: "75px" }}
+                />
+                <h2>Are you sure?</h2>
+                <p>You won't be able to revert this!</p>
+                <div className="actions-btns">
+                    <button className="yes-btn" onClick={onConfirm}>
+                        Yes, delete it!
+                    </button>
+                    <button className="no-btn" onClick={onCancel}>
+                        Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+export default ConfirmationBox;

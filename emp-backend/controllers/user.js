@@ -1,9 +1,10 @@
 const User = require("../models/user");
+const Directorate = require("../models/directorate");
 const bcrypt = require("bcrypt");
 
 const addNewUser = async (req, res) => {
     try {
-        const { name, email, password, directorate, role } = req.body;
+        const { name, email, password, role, directorate } = req.body;
 
         const isEmailDuplicate = await User.findOne({ email: email });
 
@@ -14,11 +15,13 @@ const addNewUser = async (req, res) => {
 
         const hashPassword = await bcrypt.hash(password, 10);
 
-        const userData = { name, email, password: hashPassword, directorate };
-
-        if (role) {
-            userData.role = role;
-        }
+        const userData = {
+            name,
+            email,
+            password: hashPassword,
+            role,
+            directorate,
+        };
 
         const newUser = new User(userData);
 
@@ -38,6 +41,7 @@ const getAllUsers = async (req, res) => {
         const skip = (page - 1) * limit;
 
         const allUsers = await User.find()
+            .select("-password")
             .sort({ _id: -1 })
             .limit(limit)
             .skip(skip);
@@ -54,6 +58,15 @@ const getAllUsers = async (req, res) => {
     } catch (error) {
         res.status(500).json({ error: error.message });
         console.log(error);
+    }
+};
+
+const getAllDirectoratesForNewUser = async (req, res) => {
+    try {
+        const allDirectorates = await Directorate.find().select("dirName");
+        res.status(200).json(allDirectorates);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
     }
 };
 
@@ -123,4 +136,10 @@ const deleteUser = async (req, res) => {
     }
 };
 
-module.exports = { addNewUser, getAllUsers, updateUser, deleteUser };
+module.exports = {
+    addNewUser,
+    getAllUsers,
+    updateUser,
+    deleteUser,
+    getAllDirectoratesForNewUser,
+};

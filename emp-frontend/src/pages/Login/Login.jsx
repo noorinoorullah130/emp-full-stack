@@ -40,8 +40,20 @@ const Login = () => {
 
             navigate("/app");
         } catch (error) {
-            toast.error(error.response?.data?.message || "Login failed!");
-            console.log(error);
+            if (error.response) {
+                toast.error(
+                    error.response.data?.message ||
+                        `Server Error: ${error.response?.status} ${error.response?.statusText}`
+                );
+            } else if (error.request) {
+                toast.error(
+                    "No response from server. Please check your connection."
+                );
+            } else {
+                toast.error(`Unexpected Error: ${error?.message}`);
+            }
+
+            console.error("Login error details:", error);
         } finally {
             setLoading(false);
         }

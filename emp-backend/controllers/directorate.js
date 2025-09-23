@@ -96,9 +96,10 @@ const updateDirectorate = async (req, res) => {
         const { dirCode, dirName } = req.body;
         const id = req.params.id;
 
-        if (dirCode && dirName) {
+        if (dirCode || dirName) {
             const isDirectorateExisted = await Directorate.findOne({
                 $or: [{ dirCode: dirCode }, { dirName: dirName }],
+                _id: { $ne: id },
             });
 
             if (isDirectorateExisted)

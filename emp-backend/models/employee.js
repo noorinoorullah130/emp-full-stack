@@ -2,8 +2,8 @@ const mongoose = require("mongoose");
 
 const employeeSchema = new mongoose.Schema(
     {
-        name: { type: String, required: true, trim: true },
-        fName: { type: String, required: true, trim: true },
+        name: { type: String, required: true, trim: true, lowercase: true },
+        fName: { type: String, required: true, trim: true, lowercase: true },
         grade: { type: Number, required: true, min: 1, max: 4 },
         step: { type: Number, required: true, min: 1, max: 5 },
         salary: { type: Number },

@@ -6,10 +6,13 @@ import Routing from "./components/Routing/Routing";
 import AppContext from "./context/appContext";
 
 const App = () => {
+    const [showConfirmationBox, setShowConfirmationBox] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
     const [editingItem, setEditingItem] = useState(null);
 
     const value = {
+        showConfirmationBox,
+        setShowConfirmationBox,
         isEditing,
         setIsEditing,
         editingItem,
@@ -17,12 +20,14 @@ const App = () => {
     };
 
     return (
-        <AppContext.Provider value={value}>
-            <div>
-                <Routing />
-                <ToastContainer />
-            </div>
-        </AppContext.Provider>
+        <>
+            <AppContext.Provider value={value}>
+                <div className="app">
+                    <Routing />
+                </div>
+            </AppContext.Provider>
+            <ToastContainer />
+        </>
     );
 };
 

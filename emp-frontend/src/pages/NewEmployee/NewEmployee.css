@@ -24,23 +24,72 @@
     margin-bottom: 1rem;
 }
 
-.new-user form select,
-.newemployee form select,
-.new-directorate form select {
+/* React Select Styles */
+.new-user .react-select__control,
+.newemployee .react-select__control,
+.new-directorate .react-select__control {
     width: 75%;
-    display: flex;
-    flex-direction: column;
     margin-bottom: 1rem;
-    padding: 12px 12px 12px 40px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    font-size: 0.95rem;
+    border: 1px solid #ddd !important;
+    border-radius: 5px !important;
+    font-size: 0.95rem !important;
+    min-height: 42px !important;
+    padding-left: 12px !important;
 }
 
-.new-user form select option,
-.newemployee form select option,
-.new-directorate form select option {
+.new-user .react-select__value-container,
+.newemployee .react-select__value-container,
+.new-directorate .react-select__value-container {
+    padding: 0 !important;
+}
+
+.new-user .react-select__input-container,
+.newemployee .react-select__input-container,
+.new-directorate .react-select__input-container {
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+.new-user .react-select__single-value,
+.newemployee .react-select__single-value,
+.new-directorate .react-select__single-value {
+    margin-left: 0 !important;
+}
+
+.new-user .react-select__placeholder,
+.newemployee .react-select__placeholder,
+.new-directorate .react-select__placeholder {
+    color: #999 !important;
+    margin-left: 0 !important;
+}
+
+.new-user .react-select__menu,
+.newemployee .react-select__menu,
+.new-directorate .react-select__menu {
+    width: 75% !important;
+    border: 1px solid #ddd !important;
+    border-radius: 5px !important;
+    box-shadow: 0 2px 15px rgba(0, 0, 0, 0.08) !important;
+}
+
+.new-user .react-select__option,
+.newemployee .react-select__option,
+.new-directorate .react-select__option {
     padding: 12px 12px 12px 40px;
+    font-size: 0.95rem !important;
+}
+
+.new-user .react-select__option--is-focused,
+.newemployee .react-select__option--is-focused,
+.new-directorate .react-select__option--is-focused {
+    background-color: #f0f0f0 !important;
+}
+
+.new-user .react-select__option--is-selected,
+.newemployee .react-select__option--is-selected,
+.new-directorate .react-select__option--is-selected {
+    background-color: #3f51b5 !important;
+    color: white !important;
 }
 
 .newemployee form .submit-btn,
@@ -63,7 +112,7 @@
 .new-directorate .cancel-btn {
     background-color: rgb(197, 0, 0);
     margin-top: 1rem;
-        width: 75%;
+    width: 75%;
     padding: 12px;
     color: white;
     border: none;

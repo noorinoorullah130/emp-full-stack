@@ -1,7 +1,8 @@
 import React from "react";
-import Pagination from "../../components/Pagination/Pagination";
 
 // Css Works on the employees and department css files
+import Pagination from "../../components/Pagination/Pagination";
+
 
 const AllUsers = () => {
     const allUsers = [
@@ -28,8 +29,8 @@ const AllUsers = () => {
     return (
         <div className="all-users">
             <div className="departments-header">
-                <h1>All Departments</h1>
-                <p>Complete list of all departments and their details</p>
+                <h1>All Users</h1>
+                <p>Complete list of all users and their details</p>
             </div>
 
             <table className="departments-table">
