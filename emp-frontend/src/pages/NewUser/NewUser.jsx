@@ -34,7 +34,7 @@ const NewUser = () => {
 
             const options = data.map((opt) => ({
                 value: opt.dirName,
-                label: formatText(opt.dirName).join(" "),
+                label: formatText(opt.dirName),
             }));
 
             console.log(data);
@@ -42,8 +42,10 @@ const NewUser = () => {
 
             setAllDirectorates(options);
         } catch (error) {
+            toast.error(
+                error.response?.data.message || "Error fetching directorates"
+            );
             console.error("Error fetching directorates:", error);
-            toast.error("Error fetching directorates");
         } finally {
             setLoading(false);
         }
@@ -101,11 +103,11 @@ const NewUser = () => {
                 directorate: userForm.directorate.value,
             };
 
-            console.log("Submitting:", submitData);
+            const response = await api.post("/user", submitData);
+            const data = await response.data;
 
-            // TODO: Uncomment when ready to send to API
-            // const response = await api.post("/user/create", submitData);
-            // toast.success("User created successfully!");
+            toast.success(data.message);
+            console.log(data);
 
             // Reset form
             setUserForm({
@@ -115,8 +117,6 @@ const NewUser = () => {
                 role: null,
                 directorate: null,
             });
-
-            toast.success("User created successfully!");
         } catch (error) {
             console.error("Error creating user:", error);
             toast.error("Error creating user. Please try again.");

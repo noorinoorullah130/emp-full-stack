@@ -67,7 +67,6 @@ const Routing = () => {
                 <Route path="newdepartment" element={<NewDepartment />} />
                 <Route path="employees" element={<Employees />} />
                 <Route path="newemployee" element={<NewEmployee />} />
-
                 <Route path="settings" element={<Settings />} />
             </Route>
         </Routes>

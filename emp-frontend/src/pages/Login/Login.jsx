@@ -52,7 +52,6 @@ const Login = () => {
             } else {
                 toast.error(`Unexpected Error: ${error?.message}`);
             }
-
             console.error("Login error details:", error);
         } finally {
             setLoading(false);

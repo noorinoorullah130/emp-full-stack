@@ -133,7 +133,7 @@ const AllDirectorates = () => {
                             <tr key={dir._id || i}>
                                 <td>{i + 1}</td>
                                 <td>{dir.dirCode}</td>
-                                <td>{formatText(dir.dirName).join(" ")}</td>
+                                <td>{formatText(dir.dirName)}</td>
                                 <td>{dir.employeeCountPerDirectorate}</td>
                                 <td>
                                     {dir.totalSalaryPerDirectorate.toLocaleString()}

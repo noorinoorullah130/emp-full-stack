@@ -35,8 +35,8 @@ const Employees = () => {
     return (
         <div className="employees">
             <div className="departments-header">
-                <h1>All Departments</h1>
-                <p>Complete list of all departments and their details</p>
+                <h1>All Employees</h1>
+                <p>Complete list of all employees and their details</p>
             </div>
 
             <table className="departments-table">

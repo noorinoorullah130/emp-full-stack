@@ -15,19 +15,31 @@ const addNewUser = async (req, res) => {
 
         const hashPassword = await bcrypt.hash(password, 10);
 
+        const directorateId = await Directorate.findOne({
+            dirName: directorate,
+        }).select("_id");
+
+        if (!directorateId)
+            return res
+                .status(404)
+                .json({ message: `Directorate ID was not found!` });
+
         const userData = {
             name,
             email,
             password: hashPassword,
             role,
-            directorate,
+            directorate: directorateId,
         };
 
         const newUser = new User(userData);
 
         await newUser.save();
 
-        res.status(201).json({ message: "New User Created!", newUser });
+        res.status(201).json({
+            message: "New User Created!",
+            newUser,
+        });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
@@ -46,10 +58,17 @@ const getAllUsers = async (req, res) => {
             .limit(limit)
             .skip(skip);
 
+        const allDirectorates = await Directorate.find()
+            .sort({ _id: -1 })
+            .limit(limit)
+            .skip(skip)
+            .select("dirName");
+
         const totalUsers = await User.countDocuments();
 
         res.status(200).json({
             allUsers,
+            allDirectorates,
             page,
             limit,
             skip,
