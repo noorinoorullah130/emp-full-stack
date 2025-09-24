@@ -129,18 +129,33 @@ const Dashboard = () => {
             {/* Stat Cards */}
             <div className="stats-grid">
                 {role === "admin" && (
-                    <div className="stat-card">
-                        <div
-                            className="stat-icon"
-                            style={{ backgroundColor: "#17dcd6" }}
-                        >
-                            <FaBuildingFlag />
+                    <>
+                        <div className="stat-card">
+                            <div
+                                className="stat-icon"
+                                style={{ backgroundColor: "#dc17a1ff" }}
+                            >
+                                <FaUsers />
+                            </div>
+                            <div className="stat-info">
+                                <h3>Total Users</h3>
+                                <p>{dashboardDetails.totalDirectorates}</p>
+                            </div>
                         </div>
-                        <div className="stat-info">
-                            <h3>Total Directorates</h3>
-                            <p>{dashboardDetails.totalDirectorates}</p>
+
+                        <div className="stat-card">
+                            <div
+                                className="stat-icon"
+                                style={{ backgroundColor: "#17dcd6" }}
+                            >
+                                <FaBuildingFlag />
+                            </div>
+                            <div className="stat-info">
+                                <h3>Total Directorates</h3>
+                                <p>{dashboardDetails.totalDirectorates}</p>
+                            </div>
                         </div>
-                    </div>
+                    </>
                 )}
 
                 <div className="stat-card">
@@ -164,7 +179,7 @@ const Dashboard = () => {
                         <FaBuilding />
                     </div>
                     <div className="stat-info">
-                        <h3>Departments</h3>
+                        <h3>Total Departments</h3>
                         <p>{dashboardDetails.totalDepartments}</p>
                     </div>
                 </div>

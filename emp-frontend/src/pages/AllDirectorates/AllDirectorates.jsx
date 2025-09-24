@@ -3,7 +3,7 @@ import React, { useContext, useEffect, useState } from "react";
 import Pagination from "../../components/Pagination/Pagination";
 import api from "../../utils/api";
 import { toast } from "react-toastify";
-import AppContext from "../../context/appContext";
+import AppContext from "../../context/AppContext";
 import { useNavigate } from "react-router-dom";
 import formatText from "../../utils/formatText";
 import ConfirmationBox from "../../components/ConfirmationBox/ConfirmationBox";

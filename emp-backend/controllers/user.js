@@ -112,9 +112,18 @@ const updateUser = async (req, res) => {
             }
         }
 
+        const directorateId = await Directorate.findOne({
+            dirName: directorate,
+        }).select("_id");
+
+        if (!directorateId)
+            return res
+                .status(404)
+                .json({ message: `Directorate ID was not found!` });
+
         const updatedUser = await User.findByIdAndUpdate(
             id,
-            { $set: { name, email, directorate, role } },
+            { $set: { name, email, directorate: directorateId, role } },
             { new: true, runValidators: true }
         );
 

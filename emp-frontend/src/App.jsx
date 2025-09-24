@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import "react-toastify/dist/ReactToastify.css";
 import { ToastContainer } from "react-toastify";
 import Routing from "./components/Routing/Routing";
-import AppContext from "./context/appContext";
+import AppContext from "./context/AppContext";
 
 const App = () => {
     const [showConfirmationBox, setShowConfirmationBox] = useState(false);

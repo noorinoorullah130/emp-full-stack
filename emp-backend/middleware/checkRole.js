@@ -3,9 +3,6 @@ const checkRole = (req, res, next) => {
 
     if (!userRole) return res.status(403).json({ message: "Access denied!" });
 
-    console.log(req.user)
-    console.log(userRole)
-    
     // If admin, allow everything
     if (userRole.includes("admin")) return next();
 

@@ -1,10 +1,13 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 
 // Css Works on the employees and department css files
 import Pagination from "../../components/Pagination/Pagination";
 import api from "../../utils/api";
 import { toast } from "react-toastify";
 import formatText from "../../utils/formatText";
+import AppContext from "../../context/AppContext";
+import ConfirmationBox from "../../components/ConfirmationBox/ConfirmationBox";
+import { useNavigate } from "react-router-dom";
 
 const AllUsers = () => {
     const [allUsers, setAllUsers] = useState([]);
@@ -13,6 +16,16 @@ const AllUsers = () => {
     const [limit, setLimit] = useState(10);
     const [totalUsers, setTotalUsers] = useState(0);
     const [loading, setLoading] = useState(false);
+    const [deleteId, setDeleteId] = useState(null);
+
+    const {
+        showConfirmationBox,
+        setShowConfirmationBox,
+        setIsEditing,
+        setEditingItem,
+    } = useContext(AppContext);
+
+    const navigate = useNavigate();
 
     const fetchAllUsers = async () => {
         setLoading(true);
@@ -22,8 +35,6 @@ const AllUsers = () => {
             );
             const data = await response.data;
 
-            console.log(data);
-
             setAllUsers(data.allUsers);
             setAllDirectorates(data.allDirectorates);
             setTotalUsers(data.totalUsers);
@@ -31,7 +42,6 @@ const AllUsers = () => {
             toast.error(
                 error.response?.data.message || "Something went wrong!"
             );
-            console.log(error);
         } finally {
             setLoading(false);
         }
@@ -55,11 +65,31 @@ const AllUsers = () => {
     });
 
     const handleDelete = (id) => {
-        console.log(id);
+        setDeleteId(id);
+        setShowConfirmationBox(true);
     };
 
-    const handleEdit = (id) => {
-        console.log(id);
+    const confirmDelete = async () => {
+        try {
+            setLoading(true);
+            const response = await api.delete(`/user/${deleteId}`);
+            toast.success(response?.data?.message);
+            await fetchAllUsers();
+        } catch (error) {
+            toast.error(
+                error.response?.data?.message || "Failed to delete user!"
+            );
+        } finally {
+            setLoading(false);
+            setDeleteId(null);
+            setShowConfirmationBox(false);
+        }
+    };
+
+    const handleEdit = (user) => {
+        setIsEditing(true);
+        setEditingItem(user);
+        navigate("/app/newuser");
     };
 
     return (
@@ -102,8 +132,16 @@ const AllUsers = () => {
                                 <td>{formatText(user.directorate)}</td>
                                 <td>{formatText(user.role[0])}</td>
                                 <td className="action-buttons">
-                                    <button className="edit-btn">Edit</button>
-                                    <button className="delete-btn">
+                                    <button
+                                        className="edit-btn"
+                                        onClick={() => handleEdit(user)}
+                                    >
+                                        Edit
+                                    </button>
+                                    <button
+                                        className="delete-btn"
+                                        onClick={() => handleDelete(user._id)}
+                                    >
                                         Delete
                                     </button>
                                 </td>
@@ -121,6 +159,13 @@ const AllUsers = () => {
                 totalItems={totalUsers}
                 whichPage={"Users"}
             />
+
+            {showConfirmationBox && (
+                <ConfirmationBox
+                    onConfirm={confirmDelete}
+                    onCancel={() => setShowConfirmationBox(false)}
+                />
+            )}
         </div>
     );
 };

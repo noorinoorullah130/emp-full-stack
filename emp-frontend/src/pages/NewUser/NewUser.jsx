@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 
 import api from "../../utils/api";
 import Select from "react-select";
 import formatText from "../../utils/formatText";
 import { toast } from "react-toastify";
+import AppContext from "../../context/AppContext";
 
 const NewUser = () => {
     const [userForm, setUserForm] = useState({
@@ -26,6 +27,9 @@ const NewUser = () => {
     const [allDirectorates, setAllDirectorates] = useState([]);
     const [loading, setLoading] = useState(false);
 
+    const { isEditing, setIsEditing, editingItem, setEditingItem } =
+        useContext(AppContext);
+
     const fetchDirectoratesForNewUser = async () => {
         try {
             setLoading(true);
@@ -36,20 +40,32 @@ const NewUser = () => {
                 value: opt.dirName,
                 label: formatText(opt.dirName),
             }));
-
-            console.log(data);
-            console.log(options);
-
             setAllDirectorates(options);
         } catch (error) {
             toast.error(
                 error.response?.data.message || "Error fetching directorates"
             );
-            console.error("Error fetching directorates:", error);
         } finally {
             setLoading(false);
         }
     };
+
+    useEffect(() => {
+        if (isEditing && editingItem) {
+            setUserForm({
+                name: editingItem.name,
+                email: editingItem.email,
+                role: {
+                    value: editingItem.role[0],
+                    label: formatText(editingItem.role[0]),
+                },
+                directorate: {
+                    value: editingItem.directorate,
+                    label: formatText(editingItem.directorate),
+                },
+            });
+        }
+    }, [isEditing, editingItem]);
 
     useEffect(() => {
         fetchDirectoratesForNewUser();
@@ -78,36 +94,45 @@ const NewUser = () => {
         e.preventDefault();
 
         // Validation
-        if (!userForm.directorate) {
-            toast.error("Please select user directorate");
-            return;
-        }
-        if (!userForm.role) {
-            toast.error("Please select user role");
-            return;
-        }
-        if (!userForm.name || !userForm.email || !userForm.password) {
+        if (
+            !userForm.name ||
+            !userForm.email ||
+            !userForm.role ||
+            !userForm.directorate
+        ) {
             toast.error("Please fill all required fields");
             return;
         }
 
-        try {
-            setLoading(true);
+        setLoading(true);
+        let response;
 
+        try {
             // Prepare data for API call
             const submitData = {
                 name: userForm.name,
                 email: userForm.email,
-                password: userForm.password,
+
                 role: userForm.role.value,
                 directorate: userForm.directorate.value,
             };
 
-            const response = await api.post("/user", submitData);
-            const data = await response.data;
+            if (isEditing && editingItem) {
+                response = await api.put(
+                    `/user/${editingItem._id}`,
+                    submitData
+                );
+            } else {
+                if (!userForm.password) {
+                    toast.error("Please fill all required fields");
+                    return;
+                }
+                (submitData.password = userForm.password),
+                    (response = await api.post("/user", submitData));
+            }
 
-            toast.success(data.message);
-            console.log(data);
+            const data = await response.data;
+            toast.success(data?.message);
 
             // Reset form
             setUserForm({
@@ -117,19 +142,39 @@ const NewUser = () => {
                 role: null,
                 directorate: null,
             });
+            setIsEditing(false);
+            setEditingItem(null);
         } catch (error) {
-            console.error("Error creating user:", error);
-            toast.error("Error creating user. Please try again.");
+            toast.error(
+                error.response?.data?.message ||
+                    "Error creating user. Please try again."
+            );
         } finally {
             setLoading(false); // Fixed: should be setLoading(false)
         }
     };
 
+    const handleCancel = () => {
+        setIsEditing(false);
+        setEditingItem(null);
+        setUserForm({
+            name: "",
+            email: "",
+            password: "",
+            role: null,
+            directorate: null,
+        });
+    };
+
     return (
         <div className="new-user">
             <div className="departments-header">
-                <h1>Add New Users</h1>
-                <p>Add new users and their details</p>
+                <h1>{isEditing ? "Edit User" : "Add New Users"}</h1>
+                <p>
+                    {isEditing
+                        ? "Edit user and their details"
+                        : "Add new users and their details"}
+                </p>
             </div>
 
             <form onSubmit={handleSubmit}>
@@ -157,17 +202,21 @@ const NewUser = () => {
                     required
                 />
 
-                <label htmlFor="password">Password:</label>
-                <input
-                    type="password"
-                    id="password"
-                    name="password"
-                    value={userForm.password}
-                    onChange={handleInputChange}
-                    disabled={loading}
-                    placeholder="Enter Password"
-                    required
-                />
+                {!isEditing && (
+                    <>
+                        <label htmlFor="password">Password:</label>
+                        <input
+                            type="password"
+                            id="password"
+                            name="password"
+                            value={userForm.password}
+                            onChange={handleInputChange}
+                            disabled={loading}
+                            placeholder="Enter Password"
+                            required
+                        />
+                    </>
+                )}
 
                 <label htmlFor="role">Role:</label>
                 <Select
@@ -197,9 +246,30 @@ const NewUser = () => {
                     classNamePrefix="react-select"
                 />
 
-                <button type="submit" className="submit-btn" disabled={loading}>
-                    {loading ? "Saving..." : "Save"}
-                </button>
+                <div className="form-actions">
+                    <button
+                        type="submit"
+                        disabled={loading}
+                        className="submit-btn"
+                    >
+                        {!loading
+                            ? isEditing
+                                ? "Update"
+                                : "Save"
+                            : "Saving..."}
+                    </button>
+
+                    {isEditing && (
+                        <button
+                            type="button"
+                            onClick={handleCancel}
+                            disabled={loading}
+                            className="cancel-btn"
+                        >
+                            Cancel
+                        </button>
+                    )}
+                </div>
             </form>
         </div>
     );

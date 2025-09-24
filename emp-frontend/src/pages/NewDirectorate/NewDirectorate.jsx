@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useState } from "react";
 
 import api from "../../utils/api";
 import { toast } from "react-toastify";
-import AppContext from "../../context/appContext";
+import AppContext from "../../context/AppContext";
 
 const NewDirectorate = () => {
     const [dirForm, setDirForm] = useState({ dirCode: "", dirName: "" });
