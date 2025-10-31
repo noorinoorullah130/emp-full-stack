@@ -11,7 +11,15 @@ const addNewEmployee = async (req, res) => {
         console.log(req.user);
         console.log(directorateOfNewEmployee);
 
-        if (!name || !fName || !grade || !step || !idNumber) {
+        if (
+            !name ||
+            !fName ||
+            !grade ||
+            !step ||
+            !experience ||
+            !department ||
+            !idNumber
+        ) {
             return res
                 .status(400)
                 .json({ message: "Required fields are missing!" });

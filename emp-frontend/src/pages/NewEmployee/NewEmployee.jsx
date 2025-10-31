@@ -4,7 +4,7 @@ import "./NewEmployee.css";
 
 const NewEmployee = () => {
     return (
-        <div className="newemployee">
+        <div className="new-employee">
             <div className="departments-header">
                 <h1>Add New Employees</h1>
                 <p>Add new employees and their details</p>

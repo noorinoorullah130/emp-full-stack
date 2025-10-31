@@ -23,13 +23,14 @@ app.use(express.json());
 app.use(cors());
 
 app.use("/api/user", userRoutes);
+app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/auth", authRoutes);
-app.use("/api/dpt", dptRoutes);
+app.use("/api/directorate", directorateRoutes);
+app.use("/api/department", dptRoutes);
 app.use("/api/employee", empRoutes);
 app.use("/api/setting", settingRoutes);
-app.use("/api/dashboard", dashboardRoutes);
-app.use("/api/directorate", directorateRoutes);
-app.use("/api/aggregate", aggregateMethod);
+
+// app.use("/api/aggregate", aggregateMethod);
 
 const PORT = process.env.PORT || 5000;
 

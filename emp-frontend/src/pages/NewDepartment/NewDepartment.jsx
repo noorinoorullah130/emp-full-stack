@@ -1,20 +1,105 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 
-import "./NewDepartment.css";
+import api from "./../../utils/api";
+import { toast } from "react-toastify";
+import { getTokenAndRole } from "../../utils/auth";
+import Select from "react-select";
+import formatText from "../../utils/formatText";
 
 const NewDepartment = () => {
+    const [dptForm, setDptForm] = useState({
+        dptName: "",
+        dptManager: "",
+        directorate: null,
+    });
+    const [loading, setLoading] = useState(false);
+    const [allDirectorates, setAllDirectorates] = useState([]);
+    const { role } = getTokenAndRole();
+
+    const fetchAllDirectoratesForNewDepartment = async () => {
+        try {
+            const response = await api.get("/user/directoratesfornewuser");
+            const data = await response.data;
+
+            const options = data.map((dir) => {
+                return {
+                    label: formatText(dir.dirName),
+                    value: dir.dirName,
+                };
+            });
+            setAllDirectorates(options);
+            console.log(data);
+            console.log(options);
+        } catch (error) {
+            toast.error(error.response?.data?.message || "Something is wrong!");
+            console.log(error.response);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        if (role === "admin") {
+            fetchAllDirectoratesForNewDepartment();
+        }
+    }, []);
+
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setDptForm((prev) => ({ ...prev, [name]: value }));
+    };
+
+    const handleDirectorateChange = (selectedOption) => {
+        setDptForm((prev) => ({ ...prev, directorate: selectedOption }));
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setLoading(true);
+
+        // Prepare the data
+        const setData = {
+            dptName: dptForm.dptName,
+            dptManager: dptForm.dptManager,
+            directorate: dptForm?.directorate?.value,
+        };
+
+        try {
+            const response = await api.post("/department", setData);
+            const data = await response.data;
+            toast.success(data?.message);
+
+            setDptForm({
+                dptName: "",
+                dptManager: "",
+                directorate: null,
+            });
+            // if (dptForm.directorate) {
+            // }
+        } catch (error) {
+            toast.error(error.response?.data?.message || "Something is wrong!");
+            console.log(error.response);
+        } finally {
+            setLoading(false);
+        }
+    };
+
     return (
-        <div className="newdepartment">
+        <div className="new-department">
             <div className="departments-header">
                 <h1>Add New Departments</h1>
                 <p>Add new departments and their managers</p>
             </div>
 
-            <form>
+            <form onSubmit={handleSubmit}>
                 <label htmlFor="dpt-name">Department Name:</label>
                 <input
                     type="text"
                     id="dpt-name"
+                    name="dptName"
+                    value={dptForm.dptName}
+                    onChange={handleChange}
+                    disabled={loading}
                     placeholder="Enter Department Name"
                     required
                 />
@@ -23,11 +108,57 @@ const NewDepartment = () => {
                 <input
                     type="text"
                     id="dpt-manager"
+                    name="dptManager"
+                    value={dptForm.dptManager}
+                    onChange={handleChange}
+                    disabled={loading}
                     placeholder="Enter Department Manager"
                     required
                 />
 
-                <button type="submit">Save</button>
+                {role === "admin" && (
+                    <>
+                        <label htmlFor="directorate">Directorate:</label>
+                        <Select
+                            isClearable
+                            name="directorate"
+                            value={dptForm.directorate}
+                            options={allDirectorates}
+                            onChange={handleDirectorateChange}
+                            isDisabled={loading}
+                            isLoading={loading}
+                            placeholder="Select directorate of department..."
+                            className="react-select"
+                            classNamePrefix="react-select"
+                        />
+                    </>
+                )}
+
+                <div className="form-actions">
+                    <button
+                        type="submit"
+                        disabled={loading}
+                        className="submit-btn"
+                    >
+                        Save
+                        {/* {!loading
+                            ? isEditing
+                                ? "Update"
+                                : "Save"
+                            : "Saving..."} */}
+                    </button>
+
+                    {/* {isEditing && (
+                        <button
+                            type="button"
+                            onClick={handleCancel}
+                            disabled={loading}
+                            className="cancel-btn"
+                        >
+                            Cancel
+                        </button>
+                    )} */}
+                </div>
             </form>
         </div>
     );

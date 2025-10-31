@@ -1,5 +1,6 @@
-.newemployee,
+.new-employee,
 .new-user,
+.new-department,
 .new-directorate {
     padding: 2rem;
     margin: 75px 25px 25px 275px;
@@ -8,15 +9,17 @@
     box-shadow: 0 2px 15px rgba(0, 0, 0, 0.08);
 }
 
-.newemployee form,
+.new-employee form,
 .new-user form,
+.new-department form,
 .new-directorate form {
     width: 100%;
     margin: 0 auto;
 }
 
-.newemployee form input,
+.new-employee form input,
 .new-user form input,
+.new-department form input,
 .new-directorate form input {
     width: 75%;
     display: flex;
@@ -26,7 +29,8 @@
 
 /* React Select Styles */
 .new-user .react-select__control,
-.newemployee .react-select__control,
+.new-employee .react-select__control,
+.new-department .react-select__control,
 .new-directorate .react-select__control {
     width: 75%;
     margin-bottom: 1rem;
@@ -40,33 +44,38 @@
 }
 
 .new-user .react-select__value-container,
-.newemployee .react-select__value-container,
+.new-employee .react-select__value-container,
+.new-department .react-select__value-container,
 .new-directorate .react-select__value-container {
     padding: 0 !important;
 }
 
 .new-user .react-select__input-container,
-.newemployee .react-select__input-container,
+.new-department .react-select__input-container,
+.new-employee .react-select__input-container,
 .new-directorate .react-select__input-container {
     margin: 0 !important;
     padding: 0 !important;
 }
 
 .new-user .react-select__single-value,
-.newemployee .react-select__single-value,
+.new-employee .react-select__single-value,
+.new-department .react-select__single-value,
 .new-directorate .react-select__single-value {
     margin-left: 0 !important;
 }
 
 .new-user .react-select__placeholder,
-.newemployee .react-select__placeholder,
+.new-department .react-select__placeholder,
+.new-employee .react-select__placeholder,
 .new-directorate .react-select__placeholder {
     color: #999 !important;
     margin-left: 0 !important;
 }
 
 .new-user .react-select__menu,
-.newemployee .react-select__menu,
+.new-department .react-select__menu,
+.new-employee .react-select__menu,
 .new-directorate .react-select__menu {
     width: 75% !important;
     border: 1px solid #ddd !important;
@@ -75,27 +84,31 @@
 }
 
 .new-user .react-select__option,
-.newemployee .react-select__option,
+.new-department .react-select__option,
+.new-employee .react-select__option,
 .new-directorate .react-select__option {
     padding: 12px 12px 12px 40px;
     font-size: 0.95rem !important;
 }
 
 .new-user .react-select__option--is-focused,
-.newemployee .react-select__option--is-focused,
+.new-department .react-select__option--is-focused,
+.new-employee .react-select__option--is-focused,
 .new-directorate .react-select__option--is-focused {
     background-color: #f0f0f0 !important;
 }
 
 .new-user .react-select__option--is-selected,
-.newemployee .react-select__option--is-selected,
+.new-department .react-select__option--is-selected,
+.new-employee .react-select__option--is-selected,
 .new-directorate .react-select__option--is-selected {
     background-color: #3f51b5 !important;
     color: white !important;
 }
 
-.newemployee form .submit-btn,
+.new-employee form .submit-btn,
 .new-user form .submit-btn,
+.new-department form .submit-btn,
 .new-directorate form .submit-btn {
     width: 75%;
     padding: 12px;
@@ -109,8 +122,9 @@
     transition: all 0.3s;
 }
 
-.newemployee form .cancel-btn,
+.new-employee form .cancel-btn,
 .new-user form .cancel-btn,
+.new-department form .cancel-btn,
 .new-directorate .cancel-btn {
     background-color: rgb(197, 0, 0);
     margin-top: 1rem;
@@ -125,8 +139,9 @@
     transition: all 0.3s;
 }
 
-.newemployee form button:hover,
+.new-employee form button:hover,
 .new-user form button:hover,
+.new-department form button:hover,
 .new-directorate form button:hover {
     opacity: 0.8;
 }

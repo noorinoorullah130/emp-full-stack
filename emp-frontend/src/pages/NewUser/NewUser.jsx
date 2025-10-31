@@ -112,7 +112,6 @@ const NewUser = () => {
             const submitData = {
                 name: userForm.name,
                 email: userForm.email,
-
                 role: userForm.role.value,
                 directorate: userForm.directorate.value,
             };

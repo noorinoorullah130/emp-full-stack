@@ -49,7 +49,7 @@ const AllDirectorates = () => {
         getAllDirectoratesData();
     }, [currentPage, limit]);
 
-    const fullAllDirectorateDetails = allDirectorates.map((dir) => {
+    const fullAllDirectoratesDetails = allDirectorates.map((dir) => {
         const detail = allDirectoratesDetail.find(
             (dirD) => dirD.directorate === dir.dirName
         );
@@ -122,14 +122,14 @@ const AllDirectorates = () => {
                                 Loading...
                             </td>
                         </tr>
-                    ) : fullAllDirectorateDetails.length === 0 ? (
+                    ) : fullAllDirectoratesDetails.length === 0 ? (
                         <tr>
                             <td colSpan={6} className="no-data">
                                 No Data Available!
                             </td>
                         </tr>
                     ) : (
-                        fullAllDirectorateDetails.map((dir, i) => (
+                        fullAllDirectoratesDetails.map((dir, i) => (
                             <tr key={dir._id || i}>
                                 <td>{i + 1}</td>
                                 <td>{dir.dirCode}</td>

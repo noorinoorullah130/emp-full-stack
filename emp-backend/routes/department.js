@@ -1,4 +1,6 @@
 const express = require("express");
+const router = express.Router();
+
 const verifyToken = require("../middleware/verifyToken");
 const {
     addNewDpt,
@@ -6,7 +8,6 @@ const {
     updateDpt,
     deleteDpt,
 } = require("../controllers/department");
-const router = express.Router();
 
 router.post("/", verifyToken, addNewDpt);
 router.get("/", verifyToken, getAllDpts);
