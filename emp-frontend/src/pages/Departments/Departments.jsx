@@ -1,9 +1,13 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 
 import "./Departments.css";
 import Pagination from "../../components/Pagination/Pagination";
 import api from "../../utils/api";
 import formatText from "../../utils/formatText";
+import AppContext from "../../context/AppContext";
+import ConfirmationBox from "../../components/ConfirmationBox/ConfirmationBox";
+import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 
 const Departments = () => {
     const [allDepartments, setAllDepartments] = useState([]);
@@ -12,6 +16,16 @@ const Departments = () => {
     const [limit, setLimit] = useState(10);
     const [totalDepartments, setTotalDepartments] = useState(0);
     const [loading, setLoading] = useState(false);
+    const [deleteId, setDeleteId] = useState(null);
+
+    const navigate = useNavigate();
+
+    const {
+        showConfirmationBox,
+        setShowConfirmationBox,
+        setIsEditing,
+        setEditingItem,
+    } = useContext(AppContext);
 
     const fetchAllDepartments = async () => {
         try {
@@ -51,11 +65,33 @@ const Departments = () => {
     });
 
     const handleDelete = (id) => {
+        setDeleteId(id);
+        setShowConfirmationBox(true);
         console.log(id);
     };
 
-    const handleEdit = (id) => {
-        console.log(id);
+    const confirmDelete = async () => {
+        try {
+            setLoading(true);
+            const response = await api.delete(`/department/${deleteId}`);
+            toast.success(response?.data?.message);
+            fetchAllDepartments();
+        } catch (error) {
+            toast.error(
+                error.response?.data?.message || "Failed to delete Department!"
+            );
+        } finally {
+            setLoading(false);
+            setDeleteId(null);
+            setShowConfirmationBox(false);
+        }
+    };
+
+    const handleEdit = (dept) => {
+        setIsEditing(true);
+        setEditingItem(dept);
+        navigate("/app/newdepartment");
+        console.log(dept);
     };
 
     return (
@@ -98,8 +134,16 @@ const Departments = () => {
                                 <td>{dept.employeeCountPerDpt}</td>
                                 <td>{dept.totalSalaryPerDpt}</td>
                                 <td className="action-buttons">
-                                    <button className="edit-btn">Edit</button>
-                                    <button className="delete-btn">
+                                    <button
+                                        className="edit-btn"
+                                        onClick={() => handleEdit(dept)}
+                                    >
+                                        Edit
+                                    </button>
+                                    <button
+                                        className="delete-btn"
+                                        onClick={() => handleDelete(dept._id)}
+                                    >
                                         Delete
                                     </button>
                                 </td>
@@ -117,6 +161,13 @@ const Departments = () => {
                 totalItems={totalDepartments}
                 whichPage={"Departments"}
             />
+
+            {showConfirmationBox && (
+                <ConfirmationBox
+                    onConfirm={confirmDelete}
+                    onCancel={() => setShowConfirmationBox(false)}
+                />
+            )}
         </div>
     );
 };

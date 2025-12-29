@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 
 import api from "./../../utils/api";
 import { toast } from "react-toastify";
 import { getTokenAndRole } from "../../utils/auth";
 import Select from "react-select";
 import formatText from "../../utils/formatText";
+import AppContext from "../../context/AppContext";
 
 const NewDepartment = () => {
     const [dptForm, setDptForm] = useState({
@@ -16,6 +17,10 @@ const NewDepartment = () => {
     const [allDirectorates, setAllDirectorates] = useState([]);
     const { role } = getTokenAndRole();
 
+    const { isEditing, setIsEditing, editingItem, setEditingItem } =
+        useContext(AppContext);
+
+    // For Admin
     const fetchAllDirectoratesForNewDepartment = async () => {
         try {
             const response = await api.get("/user/directoratesfornewuser");
@@ -44,6 +49,15 @@ const NewDepartment = () => {
         }
     }, []);
 
+    useEffect(() => {
+        if (isEditing && editingItem) {
+            setDptForm({
+                dptName: editingItem.dptName,
+                dptManager: editingItem.dptManager,
+            });
+        }
+    }, [isEditing, editingItem]);
+
     const handleChange = (e) => {
         const { name, value } = e.target;
         setDptForm((prev) => ({ ...prev, [name]: value }));
@@ -51,6 +65,7 @@ const NewDepartment = () => {
 
     const handleDirectorateChange = (selectedOption) => {
         setDptForm((prev) => ({ ...prev, directorate: selectedOption }));
+        console.log(selectedOption);
     };
 
     const handleSubmit = async (e) => {
@@ -64,8 +79,18 @@ const NewDepartment = () => {
             directorate: dptForm?.directorate?.value,
         };
 
+        let response;
+
         try {
-            const response = await api.post("/department", setData);
+            if (isEditing && editingItem) {
+                response = await api.put(
+                    `/department/${editingItem._id}`,
+                    setData
+                );
+            } else {
+                response = await api.post("/department", setData);
+            }
+
             const data = await response.data;
             toast.success(data?.message);
 
@@ -74,8 +99,11 @@ const NewDepartment = () => {
                 dptManager: "",
                 directorate: null,
             });
-            // if (dptForm.directorate) {
-            // }
+            setIsEditing(false);
+            setEditingItem(null);
+
+            console.log(dptForm);
+            console.log(setData);
         } catch (error) {
             toast.error(error.response?.data?.message || "Something is wrong!");
             console.log(error.response);
@@ -84,11 +112,25 @@ const NewDepartment = () => {
         }
     };
 
+    const handleCancel = () => {
+        setIsEditing(false);
+        setEditingItem(null);
+        setDptForm({
+            dptName: "",
+            dptManager: "",
+            directorate: null,
+        });
+    };
+
     return (
         <div className="new-department">
             <div className="departments-header">
-                <h1>Add New Departments</h1>
-                <p>Add new departments and their managers</p>
+                <h1>{isEditing ? "Edit Department" : "Add New Departments"}</h1>
+                <p>
+                    {isEditing
+                        ? "Edit department and their managers"
+                        : "Add new departments and their managers"}
+                </p>
             </div>
 
             <form onSubmit={handleSubmit}>
@@ -116,7 +158,7 @@ const NewDepartment = () => {
                     required
                 />
 
-                {role === "admin" && (
+                {role === "admin" && !isEditing && (
                     <>
                         <label htmlFor="directorate">Directorate:</label>
                         <Select
@@ -140,15 +182,14 @@ const NewDepartment = () => {
                         disabled={loading}
                         className="submit-btn"
                     >
-                        Save
-                        {/* {!loading
+                        {!loading
                             ? isEditing
                                 ? "Update"
                                 : "Save"
-                            : "Saving..."} */}
+                            : "Saving..."}
                     </button>
 
-                    {/* {isEditing && (
+                    {isEditing && (
                         <button
                             type="button"
                             onClick={handleCancel}
@@ -157,7 +198,7 @@ const NewDepartment = () => {
                         >
                             Cancel
                         </button>
-                    )} */}
+                    )}
                 </div>
             </form>
         </div>

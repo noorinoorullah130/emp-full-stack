@@ -78,6 +78,24 @@ const getAllEmployees = async (req, res) => {
     }
 };
 
+const getAllDepartmentsForNewEmployee = async (req, res) => {
+    try {
+        const { dirIdFromAdmin } = req.body;
+
+        const idOfDirectorateToFetchDepts = req.user.role.include("admin")
+            ? dirIdFromAdmin
+            : req.user.directorate;
+
+        const deptOfDirectorate = await Employee.findById(
+            idOfDirectorateToFetchDepts
+        );
+
+        res.status(200).json({ deptOfDirectorate });
+    } catch (error) {
+        return res.status(500).json({ error: error.message });
+    }
+};
+
 const updateEmployee = async (req, res) => {
     try {
         const { name, fName, grade, step, experience, department, idNumber } =
@@ -152,6 +170,7 @@ const deleteEmployee = async (req, res) => {
 module.exports = {
     addNewEmployee,
     getAllEmployees,
+    getAllDepartmentsForNewEmployee,
     updateEmployee,
     deleteEmployee,
 };
