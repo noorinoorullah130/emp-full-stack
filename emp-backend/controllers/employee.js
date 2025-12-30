@@ -1,3 +1,4 @@
+const Department = require("../models/department");
 const Employee = require("../models/employee");
 const calculateSalary = require("../utils/calculateSalary");
 
@@ -80,15 +81,15 @@ const getAllEmployees = async (req, res) => {
 
 const getAllDepartmentsForNewEmployee = async (req, res) => {
     try {
-        const { dirIdFromAdmin } = req.body;
+        const directorateId = parseInt(req.query.directorateId);
 
-        const idOfDirectorateToFetchDepts = req.user.role.include("admin")
-            ? dirIdFromAdmin
+        const idOfDirectorateToFetchDepts = req.user.role.includes("admin")
+            ? directorateId
             : req.user.directorate;
 
-        const deptOfDirectorate = await Employee.findById(
-            idOfDirectorateToFetchDepts
-        );
+        const deptOfDirectorate = await Department.find({
+            directorate: idOfDirectorateToFetchDepts,
+        }).sort({ _id: -1 });
 
         res.status(200).json({ deptOfDirectorate });
     } catch (error) {

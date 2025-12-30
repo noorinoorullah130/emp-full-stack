@@ -15,4 +15,5 @@ Problems in project:
 5. department editing for admin and its directorate (just watchful)
 6. two things to edit when not cancel the first one
 7. changing useEffect dependency when user = admin
-8.
+8. changing some function to reduce method
+9.

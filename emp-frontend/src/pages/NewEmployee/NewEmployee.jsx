@@ -20,6 +20,7 @@ const NewEmployee = () => {
     });
     const [loading, setLoading] = useState(false);
     const [allDirectorates, setAllDirectorates] = useState([]);
+    const [selectedDirId, setSelectedDirId] = useState("");
 
     const { role } = getTokenAndRole();
 
@@ -34,6 +35,7 @@ const NewEmployee = () => {
                 return {
                     label: formatText(dir.dirName),
                     value: dir.dirName,
+                    dirId: dir._id,
                 };
             });
 
@@ -57,7 +59,9 @@ const NewEmployee = () => {
     // All departments for directorate
     const fetchAllDepartmentsForNewEmployee = async () => {
         try {
-            const response = await api.get("/departmentsfornewemployee");
+            const response = await api.get(
+                `/employee/departmentsfornewemployee?directorateId=${selectedDirId}`
+            );
             const data = response.data;
             console.log(data);
         } catch (error) {
@@ -70,6 +74,10 @@ const NewEmployee = () => {
         }
     };
 
+    useEffect(() => {
+        fetchAllDepartmentsForNewEmployee();
+    }, [selectedDirId]);
+
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         setEmpForm((prev) => ({ ...prev, [name]: value }));
@@ -77,7 +85,8 @@ const NewEmployee = () => {
 
     const handleDirectorateChange = (selectedOption) => {
         setEmpForm((prev) => ({ ...prev, directorate: selectedOption }));
-        console.log(selectedOption);
+        setSelectedDirId(selectedOption.dirId);
+        // console.log(selectedOption);
     };
 
     const handleSubmit = (e) => {
