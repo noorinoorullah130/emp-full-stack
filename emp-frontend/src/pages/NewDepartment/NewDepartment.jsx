@@ -101,9 +101,6 @@ const NewDepartment = () => {
             });
             setIsEditing(false);
             setEditingItem(null);
-
-            console.log(dptForm);
-            console.log(setData);
         } catch (error) {
             toast.error(error.response?.data?.message || "Something is wrong!");
             console.log(error.response);

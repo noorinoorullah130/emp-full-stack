@@ -10,14 +10,12 @@ const {
 } = require("../controllers/employee");
 
 const verifyToken = require("../middleware/verifyToken");
-const checkRole = require("../middleware/checkRole");
 
 router.post("/", verifyToken, addNewEmployee);
 router.get("/", verifyToken, getAllEmployees);
 router.get(
     "/departmentsfornewemployee",
     verifyToken,
-    checkRole,
     getAllDepartmentsForNewEmployee
 );
 router.put("/:id", verifyToken, updateEmployee);

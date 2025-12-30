@@ -26,14 +26,14 @@ const login = async (req, res) => {
         expiresIn: "7d",
     });
 
-    const dirName = await Directorate.findById(user.directorate).select(
+    const directorate = await Directorate.findById(user.directorate).select(
         "dirName"
     );
 
     res.status(200).json({
         token,
         username: user.name,
-        directorate: [user.directorate, dirName],
+        directorate: directorate,
         role: user.role,
     });
 };

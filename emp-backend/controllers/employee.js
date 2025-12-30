@@ -4,13 +4,16 @@ const calculateSalary = require("../utils/calculateSalary");
 
 const addNewEmployee = async (req, res) => {
     try {
-        const { name, fName, grade, step, experience, department, idNumber } =
-            req.body;
-
-        const directorateOfNewEmployee = req.user.directorate;
-
-        console.log(req.user);
-        console.log(directorateOfNewEmployee);
+        const {
+            name,
+            fName,
+            grade,
+            step,
+            experience,
+            idNumber,
+            directorate,
+            department,
+        } = req.body;
 
         if (
             !name ||
@@ -18,8 +21,9 @@ const addNewEmployee = async (req, res) => {
             !grade ||
             !step ||
             !experience ||
-            !department ||
-            !idNumber
+            !idNumber ||
+            !directorate ||
+            !department
         ) {
             return res
                 .status(400)
@@ -40,9 +44,9 @@ const addNewEmployee = async (req, res) => {
             step,
             salary: calculateSalary(grade, step),
             experience,
-            department,
             idNumber,
-            directorate: directorateOfNewEmployee,
+            directorate,
+            department,
         });
 
         await newEmployee.save();
@@ -81,19 +85,22 @@ const getAllEmployees = async (req, res) => {
 
 const getAllDepartmentsForNewEmployee = async (req, res) => {
     try {
-        const directorateId = parseInt(req.query.directorateId);
+        const directorateId = req.query.directorateId;
 
-        const idOfDirectorateToFetchDepts = req.user.role.includes("admin")
-            ? directorateId
-            : req.user.directorate;
+        // const idOfDirectorateToFetchDepts = req.user.role.includes("admin")
+        //     ? directorateId
+        //     : req.user.directorate;
+
+        // console.log(directorateId);
+        // console.log(idOfDirectorateToFetchDepts);
 
         const deptOfDirectorate = await Department.find({
-            directorate: idOfDirectorateToFetchDepts,
-        }).sort({ _id: -1 });
+            directorate: directorateId,
+        }).select("dptName");
 
-        res.status(200).json({ deptOfDirectorate });
+        res.status(200).json(deptOfDirectorate);
     } catch (error) {
-        return res.status(500).json({ error: error.message });
+        res.status(500).json({ error: error.message });
     }
 };
 

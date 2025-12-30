@@ -20,11 +20,15 @@ const NewEmployee = () => {
     });
     const [loading, setLoading] = useState(false);
     const [allDirectorates, setAllDirectorates] = useState([]);
-    const [selectedDirId, setSelectedDirId] = useState("");
+    const [allDepartments, setAllDepartments] = useState([]);
 
-    const { role } = getTokenAndRole();
+    const { role, directorateId } = getTokenAndRole();
 
-    // All directorates for Admin
+    const [selectedDirId, setSelectedDirId] = useState(
+        role === "user" ? directorateId : null
+    );
+
+    // ====== ADMIN ======
     // We are using the same api for this as we use for new users directorate
     const fetchAllDirectoratesForNewEmployee = async () => {
         try {
@@ -52,6 +56,7 @@ const NewEmployee = () => {
 
     useEffect(() => {
         if (role === "admin") {
+            setLoading(true);
             fetchAllDirectoratesForNewEmployee();
         }
     }, [role]);
@@ -64,10 +69,19 @@ const NewEmployee = () => {
             );
             const data = response.data;
             console.log(data);
+
+            const options = data.map((dpt) => {
+                return {
+                    label: formatText(dpt.dptName),
+                    value: dpt.dptName,
+                    dptId: dpt._id,
+                };
+            });
+
+            setAllDepartments(options);
+            console.log(options);
         } catch (error) {
-            toast.error(
-                error.response?.data?.message || "Something went wrong!"
-            );
+            toast.error(error.response?.data?.message || "Something is wrong!");
             console.log(error.response);
         } finally {
             setLoading(false);
@@ -75,8 +89,12 @@ const NewEmployee = () => {
     };
 
     useEffect(() => {
+        if (!selectedDirId) return;
+
+        setLoading(true);
         fetchAllDepartmentsForNewEmployee();
     }, [selectedDirId]);
+    // ====== ADMIN ======
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -84,15 +102,75 @@ const NewEmployee = () => {
     };
 
     const handleDirectorateChange = (selectedOption) => {
-        setEmpForm((prev) => ({ ...prev, directorate: selectedOption }));
+        setEmpForm((prev) => ({
+            ...prev,
+            directorate: selectedOption,
+            department: null,
+        }));
         setSelectedDirId(selectedOption.dirId);
-        // console.log(selectedOption);
     };
 
-    const handleSubmit = (e) => {
+    const handleDepartmentChange = (selectedOption) => {
+        setEmpForm((prev) => ({ ...prev, department: selectedOption }));
+    };
+
+    const handleSubmit = async (e) => {
         e.preventDefault();
 
-        console.log(empForm);
+        if (
+            !empForm.name ||
+            !empForm.fName ||
+            !empForm.grade ||
+            !empForm.step ||
+            !empForm.experience ||
+            !empForm.idNumber ||
+            !empForm.directorate ||
+            !empForm.department
+        ) {
+            toast.error("Please fill all required fields");
+            return;
+        }
+
+        setLoading(true);
+
+        const preparedData = {
+            name: empForm.name,
+            fName: empForm.fName,
+            grade: empForm.grade,
+            step: empForm.step,
+            experience: empForm.experience,
+            idNumber: empForm.idNumber,
+            directorate: empForm.directorate.dirId,
+            department: empForm.department.dptId,
+        };
+
+        console.log(preparedData);
+
+        try {
+            const response = await api.post("employee", preparedData);
+
+            const data = await response.data;
+
+            toast.success(data?.message);
+
+            console.log(empForm);
+
+            setEmpForm({
+                name: "",
+                fName: "",
+                grade: "",
+                step: "",
+                experience: "",
+                idNumber: "",
+                directorate: null,
+                department: null,
+            });
+        } catch (error) {
+            toast.error(error.response?.data?.message);
+            console.log(error.response);
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
@@ -110,8 +188,7 @@ const NewEmployee = () => {
                     name="name"
                     value={empForm.name}
                     onChange={handleInputChange}
-                    isDisabled={loading}
-                    isLoading={loading}
+                    disabled={loading}
                     placeholder="Enter Name"
                     required
                 />
@@ -123,8 +200,7 @@ const NewEmployee = () => {
                     name="fName"
                     value={empForm.fName}
                     onChange={handleInputChange}
-                    isDisabled={loading}
-                    isLoading={loading}
+                    disabled={loading}
                     placeholder="Enter Father Name"
                     required
                 />
@@ -136,12 +212,11 @@ const NewEmployee = () => {
                     name="grade"
                     value={empForm.grade}
                     onChange={handleInputChange}
-                    isDisabled={loading}
-                    isLoading={loading}
+                    disabled={loading}
                     placeholder="Enter Grade"
                     required
                     min={1}
-                    max={8}
+                    max={4}
                 />
 
                 <label htmlFor="step">Step:</label>
@@ -151,8 +226,7 @@ const NewEmployee = () => {
                     name="step"
                     value={empForm.step}
                     onChange={handleInputChange}
-                    isDisabled={loading}
-                    isLoading={loading}
+                    disabled={loading}
                     placeholder="Enter Step"
                     required
                     min={1}
@@ -166,8 +240,7 @@ const NewEmployee = () => {
                     name="experience"
                     value={empForm.experience}
                     onChange={handleInputChange}
-                    isDisabled={loading}
-                    isLoading={loading}
+                    disabled={loading}
                     placeholder="Enter Experience by number of years"
                     required
                     min={0}
@@ -180,8 +253,7 @@ const NewEmployee = () => {
                     name="idNumber"
                     value={empForm.idNumber}
                     onChange={handleInputChange}
-                    isDisabled={loading}
-                    isLoading={loading}
+                    disabled={loading}
                     placeholder="Enter ID Number"
                     required
                 />
@@ -211,8 +283,8 @@ const NewEmployee = () => {
                     id="department"
                     name="department"
                     value={empForm.department}
-                    options={allDirectorates}
-                    onChange={handleInputChange}
+                    options={allDepartments}
+                    onChange={handleDepartmentChange}
                     isDisabled={loading}
                     isLoading={loading}
                     placeholder="Select Employee working Department"

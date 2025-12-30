@@ -35,7 +35,8 @@ const Login = () => {
                 response.data.token,
                 response.data.role,
                 response.data.username,
-                response.data.directorate[1]?.dirName
+                response.data.directorate?.dirName,
+                response.data.directorate?._id
             );
 
             navigate("/app");

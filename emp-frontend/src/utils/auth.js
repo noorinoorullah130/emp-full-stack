@@ -1,8 +1,9 @@
-const saveTokenAndRole = (token, role, username, directorate) => {
+const saveTokenAndRole = (token, role, username, directorate, directorateId) => {
     localStorage.setItem("token", token);
     localStorage.setItem("role", role);
     localStorage.setItem("username", username);
     localStorage.setItem("directorate", directorate);
+    localStorage.setItem("directorateId", directorateId);
 };
 
 const getTokenAndRole = () => {
@@ -10,7 +11,8 @@ const getTokenAndRole = () => {
     const role = localStorage.getItem("role");
     const username = localStorage.getItem("username");
     const directorate = localStorage.getItem("directorate");
-    return { token, role, username, directorate };
+    const directorateId = localStorage.getItem("directorateId");
+    return { token, role, username, directorate, directorateId };
 };
 
 const removeTokenAndRole = () => {
@@ -18,6 +20,7 @@ const removeTokenAndRole = () => {
     localStorage.removeItem("role");
     localStorage.removeItem("username");
     localStorage.removeItem("directorate");
+    localStorage.removeItem("directorateId");
 };
 
 // const isAuthenticated = () => {
