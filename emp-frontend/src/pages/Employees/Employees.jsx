@@ -13,6 +13,9 @@ const Employees = () => {
             step: 1,
             salary: 10000,
             experience: 5 + "Y",
+            directorate: "Finance and Budget",
+            department: "Payroll",
+            inrollDate: "2025/11/12",
         },
         {
             name: "Abdulrahman",
@@ -21,6 +24,9 @@ const Employees = () => {
             step: 1,
             salary: 12000,
             experience: 3 + "Y",
+            directorate: "Finance and Budget",
+            department: "Payroll",
+            inrollDate: "2025/11/12",
         },
         {
             name: "Khan Mohammad",
@@ -29,6 +35,9 @@ const Employees = () => {
             step: 5,
             salary: 18000,
             experience: 8 + "Y",
+            directorate: "Finance and Budget",
+            department: "Payroll",
+            inrollDate: "2025/11/12",
         },
     ];
 
@@ -49,6 +58,9 @@ const Employees = () => {
                         <th>Step</th>
                         <th>Salary</th>
                         <th>Experience</th>
+                        <th>Directorate</th>
+                        <th>Department</th>
+                        <th>Inroll Date</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
@@ -62,6 +74,9 @@ const Employees = () => {
                             <td>{emp.step}</td>
                             <td>{emp.salary}</td>
                             <td>{emp.experience}</td>
+                            <td>{emp.directorate}</td>
+                            <td>{emp.department}</td>
+                            <td>{emp.inrollDate}</td>
                             <td className="action-buttons">
                                 <button className="edit-btn">Edit</button>
                                 <button className="delete-btn">delete</button>

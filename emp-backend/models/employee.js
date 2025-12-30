@@ -16,9 +16,10 @@ const employeeSchema = new mongoose.Schema(
         idNumber: {
             type: String,
             required: true,
-            minLength: 8,
-            maxLength: 8,
+            minLength: 15,
+            maxLength: 15,
         },
+        inrollDate: { type: String, required: true },
     },
     { timestamps: true }
 );

@@ -1,13 +1,26 @@
 import React, { useEffect, useState } from "react";
-
-import "./NewEmployee.css";
 import Select from "react-select";
-import { getTokenAndRole } from "../../utils/auth";
 import { toast } from "react-toastify";
+
 import api from "../../utils/api";
+import { getTokenAndRole } from "../../utils/auth";
 import formatText from "../../utils/formatText";
+import "./NewEmployee.css";
+
+const formatIdNumberOfEmployee = (value) => {
+    let digits = value.replace(/\D/g, "");
+    digits = digits.slice(0, 13);
+
+    if (digits.length <= 4) return digits;
+    if (digits.length <= 8) return digits.slice(0, 4) + "-" + digits.slice(4);
+    return (
+        digits.slice(0, 4) + "-" + digits.slice(4, 8) + "-" + digits.slice(8)
+    );
+};
 
 const NewEmployee = () => {
+    const { role, directorate, directorateId } = getTokenAndRole();
+
     const [empForm, setEmpForm] = useState({
         name: "",
         fName: "",
@@ -18,87 +31,96 @@ const NewEmployee = () => {
         directorate: null,
         department: null,
     });
-    const [loading, setLoading] = useState(false);
+
+    const [selectedDirId, setSelectedDirId] = useState(null);
     const [allDirectorates, setAllDirectorates] = useState([]);
     const [allDepartments, setAllDepartments] = useState([]);
+    const [loading, setLoading] = useState(false);
 
-    const { role, directorateId } = getTokenAndRole();
+    // ====== Prefill directorate for "user" ======
+    useEffect(() => {
+        if (role === "user" && directorateId && directorate) {
+            setEmpForm((prev) => ({
+                ...prev,
+                directorate: {
+                    label: directorate,
+                    value: directorate,
+                    dirId: directorateId,
+                },
+            }));
+            setSelectedDirId(directorateId);
+        }
+    }, [role, directorate, directorateId]);
 
-    const [selectedDirId, setSelectedDirId] = useState(
-        role === "user" ? directorateId : null
-    );
-
-    // ====== ADMIN ======
-    // We are using the same api for this as we use for new users directorate
+    // ====== Fetch directorates for admin ======
     const fetchAllDirectoratesForNewEmployee = async () => {
         try {
             const response = await api.get("/user/directoratesfornewuser");
             const data = response.data;
 
-            const options = data.map((dir) => {
-                return {
-                    label: formatText(dir.dirName),
-                    value: dir.dirName,
-                    dirId: dir._id,
-                };
-            });
+            const options = data.map((dir) => ({
+                label: formatText(dir.dirName),
+                value: dir.dirName,
+                dirId: dir._id,
+            }));
 
             setAllDirectorates(options);
-            console.log(data);
-            console.log(options);
         } catch (error) {
-            toast.error(error.response?.data?.message || "Something is wrong!");
-            console.log(error.response);
-        } finally {
-            setLoading(false);
+            toast.error(
+                error.response?.data?.message || "Something went wrong!"
+            );
         }
     };
 
     useEffect(() => {
         if (role === "admin") {
             setLoading(true);
-            fetchAllDirectoratesForNewEmployee();
+            fetchAllDirectoratesForNewEmployee().finally(() =>
+                setLoading(false)
+            );
         }
     }, [role]);
 
-    // All departments for directorate
-    const fetchAllDepartmentsForNewEmployee = async () => {
+    // ====== Fetch departments when directorate changes ======
+    const fetchAllDepartmentsForNewEmployee = async (dirId) => {
         try {
             const response = await api.get(
-                `/employee/departmentsfornewemployee?directorateId=${selectedDirId}`
+                `/employee/departmentsfornewemployee?directorateId=${dirId}`
             );
             const data = response.data;
-            console.log(data);
-
-            const options = data.map((dpt) => {
-                return {
-                    label: formatText(dpt.dptName),
-                    value: dpt.dptName,
-                    dptId: dpt._id,
-                };
-            });
-
+            const options = data.map((dpt) => ({
+                label: formatText(dpt.dptName),
+                value: dpt.dptName,
+                dptId: dpt._id,
+            }));
             setAllDepartments(options);
-            console.log(options);
         } catch (error) {
-            toast.error(error.response?.data?.message || "Something is wrong!");
-            console.log(error.response);
-        } finally {
-            setLoading(false);
+            toast.error(
+                error.response?.data?.message || "Something went wrong!"
+            );
         }
     };
 
     useEffect(() => {
-        if (!selectedDirId) return;
-
-        setLoading(true);
-        fetchAllDepartmentsForNewEmployee();
+        if (selectedDirId) {
+            setLoading(true);
+            fetchAllDepartmentsForNewEmployee(selectedDirId).finally(() =>
+                setLoading(false)
+            );
+        }
     }, [selectedDirId]);
-    // ====== ADMIN ======
 
+    // ====== Handlers ======
     const handleInputChange = (e) => {
         const { name, value } = e.target;
-        setEmpForm((prev) => ({ ...prev, [name]: value }));
+        if (name === "idNumber") {
+            setEmpForm((prev) => ({
+                ...prev,
+                idNumber: formatIdNumberOfEmployee(value),
+            }));
+        } else {
+            setEmpForm((prev) => ({ ...prev, [name]: value }));
+        }
     };
 
     const handleDirectorateChange = (selectedOption) => {
@@ -117,6 +139,8 @@ const NewEmployee = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
+        const digitsOnly = empForm.idNumber.replace(/\D/g, "");
+        
         if (
             !empForm.name ||
             !empForm.fName ||
@@ -124,10 +148,11 @@ const NewEmployee = () => {
             !empForm.step ||
             !empForm.experience ||
             !empForm.idNumber ||
+            digitsOnly.length < 13 ||
             !empForm.directorate ||
             !empForm.department
         ) {
-            toast.error("Please fill all required fields");
+            toast.error("Please fill all required fields with valid data!");
             return;
         }
 
@@ -144,17 +169,11 @@ const NewEmployee = () => {
             department: empForm.department.dptId,
         };
 
-        console.log(preparedData);
-
         try {
             const response = await api.post("employee", preparedData);
+            toast.success(response.data?.message);
 
-            const data = await response.data;
-
-            toast.success(data?.message);
-
-            console.log(empForm);
-
+            // Reset form
             setEmpForm({
                 name: "",
                 fName: "",
@@ -162,12 +181,20 @@ const NewEmployee = () => {
                 step: "",
                 experience: "",
                 idNumber: "",
-                directorate: null,
+                directorate:
+                    role === "user"
+                        ? {
+                              label: formatText(directorate),
+                              value: directorate,
+                              dirId: directorateId,
+                          }
+                        : null,
                 department: null,
             });
         } catch (error) {
-            toast.error(error.response?.data?.message);
-            console.log(error.response);
+            toast.error(
+                error.response?.data?.message || "Something went wrong!"
+            );
         } finally {
             setLoading(false);
         }
@@ -190,7 +217,6 @@ const NewEmployee = () => {
                     onChange={handleInputChange}
                     disabled={loading}
                     placeholder="Enter Name"
-                    required
                 />
 
                 <label htmlFor="fName">Father Name:</label>
@@ -202,7 +228,6 @@ const NewEmployee = () => {
                     onChange={handleInputChange}
                     disabled={loading}
                     placeholder="Enter Father Name"
-                    required
                 />
 
                 <label htmlFor="grade">Grade:</label>
@@ -214,7 +239,6 @@ const NewEmployee = () => {
                     onChange={handleInputChange}
                     disabled={loading}
                     placeholder="Enter Grade"
-                    required
                     min={1}
                     max={4}
                 />
@@ -228,7 +252,6 @@ const NewEmployee = () => {
                     onChange={handleInputChange}
                     disabled={loading}
                     placeholder="Enter Step"
-                    required
                     min={1}
                     max={5}
                 />
@@ -242,7 +265,6 @@ const NewEmployee = () => {
                     onChange={handleInputChange}
                     disabled={loading}
                     placeholder="Enter Experience by number of years"
-                    required
                     min={0}
                 />
 
@@ -254,8 +276,7 @@ const NewEmployee = () => {
                     value={empForm.idNumber}
                     onChange={handleInputChange}
                     disabled={loading}
-                    placeholder="Enter ID Number"
-                    required
+                    placeholder="Enter ID Number (1400-0101-12345)"
                 />
 
                 {role === "admin" && (
@@ -292,8 +313,8 @@ const NewEmployee = () => {
                     classNamePrefix="react-select"
                 />
 
-                <button type="submit" className="submit-btn">
-                    Save
+                <button type="submit" className="submit-btn" disabled={loading}>
+                    {loading ? "Saving..." : "Save"}
                 </button>
             </form>
         </div>
