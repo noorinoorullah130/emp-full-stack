@@ -18,6 +18,7 @@ const AllDirectorates = () => {
     const [deleteId, setDeleteId] = useState(null);
 
     const navigate = useNavigate();
+    
     const {
         showConfirmationBox,
         setShowConfirmationBox,

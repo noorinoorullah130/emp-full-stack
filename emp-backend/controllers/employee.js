@@ -1,4 +1,5 @@
 const Department = require("../models/department");
+const Directorate = require("../models/directorate");
 const Employee = require("../models/employee");
 const calculateSalary = require("../utils/calculateSalary");
 
@@ -13,6 +14,7 @@ const addNewEmployee = async (req, res) => {
             idNumber,
             directorate,
             department,
+            hireDate,
         } = req.body;
 
         if (
@@ -23,7 +25,8 @@ const addNewEmployee = async (req, res) => {
             !experience ||
             !idNumber ||
             !directorate ||
-            !department
+            !department ||
+            !hireDate
         ) {
             return res
                 .status(400)
@@ -47,6 +50,7 @@ const addNewEmployee = async (req, res) => {
             idNumber,
             directorate,
             department,
+            hireDate,
         });
 
         await newEmployee.save();
@@ -64,18 +68,44 @@ const getAllEmployees = async (req, res) => {
 
         const skip = (page - 1) * limit;
 
-        const allEmployees = await Employee.find()
-            .sort({ _id: -1 })
-            .limit(limit)
-            .skip(skip);
+        const allEmployees = req.user.role.includes("admin")
+            ? await Employee.find().sort({ _id: -1 }).limit(limit).skip(skip)
+            : await Employee.find({ directorate: req.user.directorate })
+                  .sort({ _id: -1 })
+                  .limit(limit)
+                  .skip(skip);
 
-        const totalEmployees = await Employee.countDocuments();
+        const allDirecorates = await Directorate.find();
+        const allDepartments = await Department.find();
+
+        // Combine Directorate & Department names with each Employee instead of their IDs
+        const employeesWithDirectorateName = allEmployees.map((emp) => {
+            const dir = allDirecorates.find((d) =>
+                d._id.equals(emp.directorate)
+            );
+
+            const dpt = allDepartments.find((d) =>
+                d._id.equals(emp.department)
+            );
+
+            return {
+                ...emp.toObject(),
+                directorate: dir.dirName,
+                department: dpt.dptName,
+            };
+        });
+
+        const totalEmployees = req.user.role.includes("admin")
+            ? await Employee.countDocuments()
+            : await Employee.countDocuments({
+                  directorate: req.user.directorate,
+              });
 
         res.status(200).json({
             page,
             limit,
             skip,
-            allEmployees,
+            allEmployees: employeesWithDirectorateName,
             totalEmployees,
         });
     } catch (error) {

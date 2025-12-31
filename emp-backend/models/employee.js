@@ -19,7 +19,7 @@ const employeeSchema = new mongoose.Schema(
             minLength: 15,
             maxLength: 15,
         },
-        inrollDate: { type: String, required: true },
+        hireDate: { type: String, required: true },
     },
     { timestamps: true }
 );

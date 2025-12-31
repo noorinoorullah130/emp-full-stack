@@ -1,22 +1,18 @@
 import React, { useEffect, useState } from "react";
+
+import "./NewEmployee.css";
+import api from "../../utils/api";
+import formatText from "../../utils/formatText";
+import formatIdNumberOfEmployee from "../../utils/formatIdNumberOfEmployee";
+
+import { getTokenAndRole } from "../../utils/auth";
 import Select from "react-select";
 import { toast } from "react-toastify";
 
-import api from "../../utils/api";
-import { getTokenAndRole } from "../../utils/auth";
-import formatText from "../../utils/formatText";
-import "./NewEmployee.css";
-
-const formatIdNumberOfEmployee = (value) => {
-    let digits = value.replace(/\D/g, "");
-    digits = digits.slice(0, 13);
-
-    if (digits.length <= 4) return digits;
-    if (digits.length <= 8) return digits.slice(0, 4) + "-" + digits.slice(4);
-    return (
-        digits.slice(0, 4) + "-" + digits.slice(4, 8) + "-" + digits.slice(8)
-    );
-};
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import TextField from "@mui/material/TextField";
 
 const NewEmployee = () => {
     const { role, directorate, directorateId } = getTokenAndRole();
@@ -30,6 +26,7 @@ const NewEmployee = () => {
         idNumber: "",
         directorate: null,
         department: null,
+        hireDate: null,
     });
 
     const [selectedDirId, setSelectedDirId] = useState(null);
@@ -140,7 +137,7 @@ const NewEmployee = () => {
         e.preventDefault();
 
         const digitsOnly = empForm.idNumber.replace(/\D/g, "");
-        
+
         if (
             !empForm.name ||
             !empForm.fName ||
@@ -150,7 +147,8 @@ const NewEmployee = () => {
             !empForm.idNumber ||
             digitsOnly.length < 13 ||
             !empForm.directorate ||
-            !empForm.department
+            !empForm.department ||
+            !empForm.hireDate
         ) {
             toast.error("Please fill all required fields with valid data!");
             return;
@@ -167,6 +165,9 @@ const NewEmployee = () => {
             idNumber: empForm.idNumber,
             directorate: empForm.directorate.dirId,
             department: empForm.department.dptId,
+            hireDate: empForm.hireDate
+                ? empForm.hireDate.format("YYYY-MM-DD")
+                : null,
         };
 
         try {
@@ -190,6 +191,7 @@ const NewEmployee = () => {
                           }
                         : null,
                 department: null,
+                hireDate: null,
             });
         } catch (error) {
             toast.error(
@@ -312,6 +314,32 @@ const NewEmployee = () => {
                     className="react-select"
                     classNamePrefix="react-select"
                 />
+
+                <label htmlFor="hireDate">Hire Date:</label>
+                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                    <DatePicker
+                        value={empForm.hireDate}
+                        className="date-picker"
+                        onChange={(newValue) =>
+                            setEmpForm((prev) => ({
+                                ...prev,
+                                hireDate: newValue,
+                            }))
+                        }
+                        slotProps={{
+                            textField: {
+                                placeholder: "Select hire date",
+                                sx: {
+                                    width: "75%",
+                                    marginBottom: "1rem",
+                                },
+                                InputLabelProps: {
+                                    shrink: true,
+                                },
+                            },
+                        }}
+                    />
+                </LocalizationProvider>
 
                 <button type="submit" className="submit-btn" disabled={loading}>
                     {loading ? "Saving..." : "Save"}

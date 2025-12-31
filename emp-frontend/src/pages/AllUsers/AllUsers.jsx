@@ -31,7 +31,7 @@ const AllUsers = () => {
         setLoading(true);
         try {
             const response = await api.get(
-                `/user?page=${currentPage}&limit${limit}`
+                `/user?page=${currentPage}&limit=${limit}`
             );
             const data = await response.data;
 
@@ -49,7 +49,7 @@ const AllUsers = () => {
 
     useEffect(() => {
         fetchAllUsers();
-    }, []);
+    }, [currentPage, limit]);
 
     const fullAllUserDetails = allUsers.map((user) => {
         const isUserHasDirectorate = allDirectorates.find(

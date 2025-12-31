@@ -17,6 +17,10 @@
     margin: 0 auto;
 }
 
+form label {
+    display: block;
+}
+
 .new-employee form input,
 .new-user form input,
 .new-department form input,

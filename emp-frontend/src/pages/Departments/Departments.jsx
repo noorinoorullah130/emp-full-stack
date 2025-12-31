@@ -32,7 +32,7 @@ const Departments = () => {
             setLoading(true);
 
             const response = await api.get(
-                `/department?page=${currentPage}&limit${limit}`
+                `/department?page=${currentPage}&limit=${limit}`
             );
 
             const data = await response.data;
@@ -50,11 +50,11 @@ const Departments = () => {
 
     useEffect(() => {
         fetchAllDepartments();
-    }, []);
+    }, [currentPage, limit]);
 
     const fullAllDepartmentsDetails = allDepartments.map((dpt) => {
         const detail = allDepartmentsDetail.find(
-            (dpt) => dpt.dptName === dpt.dptName
+            (d) => d.dptName === dpt.dptName
         );
 
         return {

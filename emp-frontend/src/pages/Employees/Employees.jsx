@@ -1,45 +1,47 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 
 // Now the css working on departments css file
 import "./Employees.css";
 import Pagination from "../../components/Pagination/Pagination";
+import { toast } from "react-toastify";
+import api from "../../utils/api";
+import formatText from "../../utils/formatText";
+import { getTokenAndRole } from "../../utils/auth";
 
 const Employees = () => {
-    const employees = [
-        {
-            name: "Noorullah",
-            fName: "Sohail Badshah",
-            grade: 4,
-            step: 1,
-            salary: 10000,
-            experience: 5 + "Y",
-            directorate: "Finance and Budget",
-            department: "Payroll",
-            inrollDate: "2025/11/12",
-        },
-        {
-            name: "Abdulrahman",
-            fName: "Sohail Badshah",
-            grade: 3,
-            step: 1,
-            salary: 12000,
-            experience: 3 + "Y",
-            directorate: "Finance and Budget",
-            department: "Payroll",
-            inrollDate: "2025/11/12",
-        },
-        {
-            name: "Khan Mohammad",
-            fName: "Mir Mohammad",
-            grade: 2,
-            step: 5,
-            salary: 18000,
-            experience: 8 + "Y",
-            directorate: "Finance and Budget",
-            department: "Payroll",
-            inrollDate: "2025/11/12",
-        },
-    ];
+    const { role } = getTokenAndRole();
+
+    const [allEmployees, setAllEmployees] = useState([]);
+    const [loading, setLoading] = useState(false);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [limit, setLimit] = useState(10);
+    const [totalEmployees, setTotalEmployees] = useState(0);
+
+    const fetchAllEmployees = async () => {
+        setLoading(true);
+
+        try {
+            const response = await api.get(
+                `/employee?page=${currentPage}&limit=${limit}`
+            );
+            const data = response.data;
+
+            console.log(data);
+            setAllEmployees(data.allEmployees);
+            setTotalEmployees(data.totalEmployees);
+        } catch (error) {
+            toast.error(
+                error.response?.data?.message || "Something went wrong!"
+            );
+            console.log(error.response);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        fetchAllEmployees();
+    }, [currentPage, limit]);
 
     return (
         <div className="employees">
@@ -58,35 +60,60 @@ const Employees = () => {
                         <th>Step</th>
                         <th>Salary</th>
                         <th>Experience</th>
-                        <th>Directorate</th>
+                        {role === "admin" && <th>Directorate</th>}
                         <th>Department</th>
-                        <th>Inroll Date</th>
+                        <th>Hire Date</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {employees.map((emp, i) => (
-                        <tr key={emp.id}>
-                            <td>{i + 1}</td>
-                            <td>{emp.name}</td>
-                            <td>{emp.fName}</td>
-                            <td>{emp.grade}</td>
-                            <td>{emp.step}</td>
-                            <td>{emp.salary}</td>
-                            <td>{emp.experience}</td>
-                            <td>{emp.directorate}</td>
-                            <td>{emp.department}</td>
-                            <td>{emp.inrollDate}</td>
-                            <td className="action-buttons">
-                                <button className="edit-btn">Edit</button>
-                                <button className="delete-btn">delete</button>
+                    {loading ? (
+                        <tr>
+                            <td colSpan={11} className="no-data">
+                                Loading...
                             </td>
                         </tr>
-                    ))}
+                    ) : allEmployees.length === 0 ? (
+                        <tr>
+                            <td colSpan={11} className="no-data">
+                                No Data Available!
+                            </td>
+                        </tr>
+                    ) : (
+                        allEmployees?.map((emp, i) => (
+                            <tr key={emp.id}>
+                                <td>{i + 1}</td>
+                                <td>{formatText(emp.name)}</td>
+                                <td>{formatText(emp.fName)}</td>
+                                <td>{emp.grade}</td>
+                                <td>{emp.step}</td>
+                                <td>{emp.salary.toLocaleString()}</td>
+                                <td>{emp.experience}</td>
+                                {role === "admin" && (
+                                    <td>{formatText(emp.directorate)}</td>
+                                )}
+                                <td>{formatText(emp.department)}</td>
+                                <td>{emp.hireDate}</td>
+                                <td className="action-buttons">
+                                    <button className="edit-btn">Edit</button>
+                                    <button className="delete-btn">
+                                        delete
+                                    </button>
+                                </td>
+                            </tr>
+                        ))
+                    )}
                 </tbody>
             </table>
 
-            <Pagination />
+            <Pagination
+                currentPage={currentPage}
+                setCurrentPage={setCurrentPage}
+                limit={limit}
+                setLimit={setLimit}
+                totalItems={totalEmployees}
+                whichPage="Employees"
+            />
         </div>
     );
 };

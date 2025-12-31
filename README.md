@@ -16,4 +16,5 @@ Problems in project:
 6. two things to edit when not cancel the first one
 7. changing useEffect dependency when user = admin
 8. changing some function to reduce method
-9.
+9. pagination just working in all directorate component, not anyone else
+10.

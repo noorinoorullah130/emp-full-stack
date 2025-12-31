@@ -59,8 +59,6 @@ const getAllDpts = async (req, res) => {
 
         const skip = (page - 1) * limit;
 
-        // const userId = req.user.role.includes("admin")
-
         const allDpts = req.user.role.includes("admin")
             ? await Department.find().sort({ _id: -1 }).limit(limit).skip(skip)
             : await Department.find({
@@ -99,12 +97,12 @@ const getAllDpts = async (req, res) => {
         );
 
         res.status(200).json({
+            allDpts,
             page,
             limit,
             skip,
-            allDpts,
-            empPerDepartments,
             totalDpts,
+            empPerDepartments,
         });
     } catch (error) {
         res.status(500).json({ error: error.message });

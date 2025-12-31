@@ -12,3 +12,8 @@ body {
 .app {
     position: relative;
 }
+
+.no-data {
+    text-align: center;
+    font-size: 2rem;
+}
