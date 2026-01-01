@@ -117,13 +117,6 @@ const getAllDepartmentsForNewEmployee = async (req, res) => {
     try {
         const directorateId = req.query.directorateId;
 
-        // const idOfDirectorateToFetchDepts = req.user.role.includes("admin")
-        //     ? directorateId
-        //     : req.user.directorate;
-
-        // console.log(directorateId);
-        // console.log(idOfDirectorateToFetchDepts);
-
         const deptOfDirectorate = await Department.find({
             directorate: directorateId,
         }).select("dptName");
@@ -136,8 +129,17 @@ const getAllDepartmentsForNewEmployee = async (req, res) => {
 
 const updateEmployee = async (req, res) => {
     try {
-        const { name, fName, grade, step, experience, department, idNumber } =
-            req.body;
+        const {
+            name,
+            fName,
+            grade,
+            step,
+            experience,
+            directorate,
+            department,
+            idNumber,
+            hireDate,
+        } = req.body;
 
         const id = req.params.id;
 
@@ -169,9 +171,12 @@ const updateEmployee = async (req, res) => {
                     fName,
                     grade,
                     step,
+                    salary: calculateSalary(grade, step),
                     experience,
+                    directorate,
                     department,
                     idNumber,
+                    hireDate,
                 },
             },
             { new: true, runValidators: true }

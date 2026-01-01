@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 
 // Now the css working on departments css file
 import "./Employees.css";
@@ -7,15 +7,30 @@ import { toast } from "react-toastify";
 import api from "../../utils/api";
 import formatText from "../../utils/formatText";
 import { getTokenAndRole } from "../../utils/auth";
+import AppContext from "../../context/AppContext";
+import ConfirmationBox from "../../components/ConfirmationBox/ConfirmationBox";
+import { useNavigate } from "react-router-dom";
 
 const Employees = () => {
     const { role } = getTokenAndRole();
+
+    const {
+        showConfirmationBox,
+        setShowConfirmationBox,
+        isEditing,
+        setIsEditing,
+        editingItem,
+        setEditingItem,
+    } = useContext(AppContext);
+
+    const navigate = useNavigate();
 
     const [allEmployees, setAllEmployees] = useState([]);
     const [loading, setLoading] = useState(false);
     const [currentPage, setCurrentPage] = useState(1);
     const [limit, setLimit] = useState(10);
     const [totalEmployees, setTotalEmployees] = useState(0);
+    const [deleteId, setDeleteId] = useState(null);
 
     const fetchAllEmployees = async () => {
         setLoading(true);
@@ -42,6 +57,37 @@ const Employees = () => {
     useEffect(() => {
         fetchAllEmployees();
     }, [currentPage, limit]);
+
+    const handleDelete = (id) => {
+        console.log(id);
+        setDeleteId(id);
+        setShowConfirmationBox(true);
+    };
+
+    const confirmDelete = async () => {
+        setLoading(true);
+
+        try {
+            const response = await api.delete(`/employee/${deleteId}`);
+            const data = response.data;
+
+            toast.success(data?.message);
+            fetchAllEmployees();
+        } catch (error) {
+            toast.error(error.response?.data?.message);
+            console.log(error.response);
+        } finally {
+            setShowConfirmationBox(false);
+            setLoading(false);
+        }
+    };
+
+    const handleEdit = (emp) => {
+        console.log(emp);
+        setIsEditing(true);
+        setEditingItem(emp);
+        navigate("/app/newemployee");
+    };
 
     return (
         <div className="employees">
@@ -81,7 +127,7 @@ const Employees = () => {
                         </tr>
                     ) : (
                         allEmployees?.map((emp, i) => (
-                            <tr key={emp.id}>
+                            <tr key={emp._id}>
                                 <td>{i + 1}</td>
                                 <td>{formatText(emp.name)}</td>
                                 <td>{formatText(emp.fName)}</td>
@@ -95,8 +141,16 @@ const Employees = () => {
                                 <td>{formatText(emp.department)}</td>
                                 <td>{emp.hireDate}</td>
                                 <td className="action-buttons">
-                                    <button className="edit-btn">Edit</button>
-                                    <button className="delete-btn">
+                                    <button
+                                        className="edit-btn"
+                                        onClick={() => handleEdit(emp)}
+                                    >
+                                        Edit
+                                    </button>
+                                    <button
+                                        className="delete-btn"
+                                        onClick={() => handleDelete(emp._id)}
+                                    >
                                         delete
                                     </button>
                                 </td>
@@ -114,6 +168,13 @@ const Employees = () => {
                 totalItems={totalEmployees}
                 whichPage="Employees"
             />
+
+            {showConfirmationBox && (
+                <ConfirmationBox
+                    onConfirm={confirmDelete}
+                    onCancel={() => setShowConfirmationBox(false)}
+                />
+            )}
         </div>
     );
 };

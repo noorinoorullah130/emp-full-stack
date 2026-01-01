@@ -87,6 +87,8 @@ const NewDepartment = () => {
                     `/department/${editingItem._id}`,
                     setData
                 );
+                setIsEditing(false);
+                setEditingItem(null);
             } else {
                 response = await api.post("/department", setData);
             }
@@ -99,8 +101,6 @@ const NewDepartment = () => {
                 dptManager: "",
                 directorate: null,
             });
-            setIsEditing(false);
-            setEditingItem(null);
         } catch (error) {
             toast.error(error.response?.data?.message || "Something is wrong!");
             console.log(error.response);

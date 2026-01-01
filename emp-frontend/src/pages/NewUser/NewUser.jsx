@@ -5,6 +5,7 @@ import Select from "react-select";
 import formatText from "../../utils/formatText";
 import { toast } from "react-toastify";
 import AppContext from "../../context/AppContext";
+import { allRoles } from "../../utils/selectOptions";
 
 const NewUser = () => {
     const [userForm, setUserForm] = useState({
@@ -14,16 +15,7 @@ const NewUser = () => {
         role: null,
         directorate: null,
     });
-    const allRoles = [
-        {
-            value: "user",
-            label: "User",
-        },
-        {
-            value: "admin",
-            label: "Admin",
-        },
-    ];
+
     const [allDirectorates, setAllDirectorates] = useState([]);
     const [loading, setLoading] = useState(false);
 

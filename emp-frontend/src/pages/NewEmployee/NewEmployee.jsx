@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 
 import "./NewEmployee.css";
 import api from "../../utils/api";
@@ -13,15 +13,21 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import TextField from "@mui/material/TextField";
+import dayjs from "dayjs";
+import AppContext from "../../context/AppContext";
+import { allGrades, allSteps } from "../../utils/selectOptions";
 
 const NewEmployee = () => {
     const { role, directorate, directorateId } = getTokenAndRole();
 
+    const { isEditing, setIsEditing, editingItem, setEditingItem } =
+        useContext(AppContext);
+
     const [empForm, setEmpForm] = useState({
         name: "",
         fName: "",
-        grade: "",
-        step: "",
+        grade: null,
+        step: null,
         experience: "",
         idNumber: "",
         directorate: null,
@@ -107,6 +113,23 @@ const NewEmployee = () => {
         }
     }, [selectedDirId]);
 
+    // EDITING EXSITING EMPLOYEE
+    useEffect(() => {
+        if ((isEditing, editingItem)) {
+            setEmpForm({
+                name: editingItem.name,
+                fName: editingItem.fName,
+                grade: editingItem.grade,
+                step: editingItem.step,
+                experience: editingItem.experience,
+                idNumber: editingItem.idNumber,
+                directorate: editingItem.directorate,
+                department: editingItem.department,
+                hireDate: dayjs(editingItem.hireDate),
+            });
+        }
+    }, [isEditing, editingItem]);
+
     // ====== Handlers ======
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -118,6 +141,20 @@ const NewEmployee = () => {
         } else {
             setEmpForm((prev) => ({ ...prev, [name]: value }));
         }
+    };
+
+    const handleGradeChange = (selectedOption) => {
+        setEmpForm((prev) => ({
+            ...prev,
+            grade: selectedOption,
+        }));
+    };
+
+    const handleStepChange = (selectedOption) => {
+        setEmpForm((prev) => ({
+            ...prev,
+            step: selectedOption,
+        }));
     };
 
     const handleDirectorateChange = (selectedOption) => {
@@ -159,19 +196,32 @@ const NewEmployee = () => {
         const preparedData = {
             name: empForm.name,
             fName: empForm.fName,
-            grade: empForm.grade,
-            step: empForm.step,
+            grade: empForm.grade.value,
+            step: empForm.step.value,
             experience: empForm.experience,
             idNumber: empForm.idNumber,
-            directorate: empForm.directorate.dirId,
-            department: empForm.department.dptId,
-            hireDate: empForm.hireDate
-                ? empForm.hireDate.format("YYYY-MM-DD")
-                : null,
+            ...(isEditing !== true && {
+                directorate: empForm.directorate.dirId,
+            }),
+            ...(isEditing !== true && { department: empForm.department.dptId }),
+            hireDate: empForm.hireDate.format("YYYY-MM-DD"),
         };
 
+        let response;
+
         try {
-            const response = await api.post("employee", preparedData);
+            if (isEditing && editingItem) {
+                response = await api.put(
+                    `/employee/${editingItem._id}`,
+                    preparedData
+                );
+
+                setIsEditing(false);
+                setEditingItem(null);
+            } else {
+                response = await api.post("employee", preparedData);
+            }
+
             toast.success(response.data?.message);
 
             // Reset form
@@ -202,11 +252,38 @@ const NewEmployee = () => {
         }
     };
 
+    const handleCancel = () => {
+        setIsEditing(false);
+        setEditingItem(null);
+        setEmpForm({
+            name: "",
+            fName: "",
+            grade: "",
+            step: "",
+            experience: "",
+            idNumber: "",
+            directorate:
+                role === "user"
+                    ? {
+                          label: formatText(directorate),
+                          value: directorate,
+                          dirId: directorateId,
+                      }
+                    : null,
+            department: null,
+            hireDate: null,
+        });
+    };
+
     return (
         <div className="new-employee">
             <div className="departments-header">
-                <h1>Add New Employees</h1>
-                <p>Add new employees and their details</p>
+                <h1>{isEditing ? "Edit Employee" : "Add New Employees"}</h1>
+                <p>
+                    {isEditing
+                        ? "Edit employee and details"
+                        : "Add new employees and their details"}
+                </p>
             </div>
 
             <form onSubmit={handleSubmit}>
@@ -233,29 +310,33 @@ const NewEmployee = () => {
                 />
 
                 <label htmlFor="grade">Grade:</label>
-                <input
-                    type="number"
-                    id="grade"
+                <Select
+                    isClearable
                     name="grade"
+                    id="grade"
                     value={empForm.grade}
-                    onChange={handleInputChange}
-                    disabled={loading}
+                    options={allGrades}
+                    onChange={handleGradeChange}
+                    isDisabled={loading}
+                    isLoading={loading}
                     placeholder="Enter Grade"
-                    min={1}
-                    max={4}
+                    className="react-select"
+                    classNamePrefix="react-select"
                 />
 
                 <label htmlFor="step">Step:</label>
-                <input
-                    type="number"
+                <Select
+                    isClearable
                     id="step"
                     name="step"
                     value={empForm.step}
-                    onChange={handleInputChange}
-                    disabled={loading}
+                    options={allSteps}
+                    onChange={handleStepChange}
+                    isDisabled={loading}
+                    isLoading={loading}
                     placeholder="Enter Step"
-                    min={1}
-                    max={5}
+                    className="react-select"
+                    classNamePrefix="react-select"
                 />
 
                 <label htmlFor="experience">Experience:</label>
@@ -281,7 +362,7 @@ const NewEmployee = () => {
                     placeholder="Enter ID Number (1400-0101-12345)"
                 />
 
-                {role === "admin" && (
+                {role === "admin" && !isEditing && (
                     <>
                         <label htmlFor="directorate">Directorate:</label>
                         <Select
@@ -300,30 +381,34 @@ const NewEmployee = () => {
                     </>
                 )}
 
-                <label htmlFor="department">Department:</label>
-                <Select
-                    isClearable
-                    id="department"
-                    name="department"
-                    value={empForm.department}
-                    options={allDepartments}
-                    onChange={handleDepartmentChange}
-                    isDisabled={loading}
-                    isLoading={loading}
-                    placeholder="Select Employee working Department"
-                    className="react-select"
-                    classNamePrefix="react-select"
-                />
+                {!isEditing && (
+                    <>
+                        <label htmlFor="department">Department:</label>
+                        <Select
+                            isClearable
+                            id="department"
+                            name="department"
+                            value={empForm.department}
+                            options={allDepartments}
+                            onChange={handleDepartmentChange}
+                            isDisabled={loading}
+                            isLoading={loading}
+                            placeholder="Select Employee working Department"
+                            className="react-select"
+                            classNamePrefix="react-select"
+                        />
+                    </>
+                )}
 
                 <label htmlFor="hireDate">Hire Date:</label>
                 <LocalizationProvider dateAdapter={AdapterDayjs}>
                     <DatePicker
                         value={empForm.hireDate}
                         className="date-picker"
-                        onChange={(newValue) =>
+                        onChange={(date) =>
                             setEmpForm((prev) => ({
                                 ...prev,
-                                hireDate: newValue,
+                                hireDate: date,
                             }))
                         }
                         slotProps={{
@@ -341,9 +426,30 @@ const NewEmployee = () => {
                     />
                 </LocalizationProvider>
 
-                <button type="submit" className="submit-btn" disabled={loading}>
-                    {loading ? "Saving..." : "Save"}
-                </button>
+                <div className="form-actions">
+                    <button
+                        type="submit"
+                        disabled={loading}
+                        className="submit-btn"
+                    >
+                        {!loading
+                            ? isEditing
+                                ? "Update"
+                                : "Save"
+                            : "Saving..."}
+                    </button>
+
+                    {isEditing && (
+                        <button
+                            type="button"
+                            onClick={handleCancel}
+                            disabled={loading}
+                            className="cancel-btn"
+                        >
+                            Cancel
+                        </button>
+                    )}
+                </div>
             </form>
         </div>
     );
