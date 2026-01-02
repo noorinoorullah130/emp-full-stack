@@ -17,4 +17,6 @@ Problems in project:
 7. changing useEffect dependency when user = admin
 8. changing some function to reduce method
 9. pagination just working in all directorate component, not anyone else
-10.
+10. add empty form variable
+11. when deleting dpt, we must delete its employee first, when we delete directorate, we must delete user and its departments
+12.

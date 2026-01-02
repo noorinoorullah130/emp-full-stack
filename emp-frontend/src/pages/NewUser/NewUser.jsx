@@ -23,8 +23,8 @@ const NewUser = () => {
         useContext(AppContext);
 
     const fetchDirectoratesForNewUser = async () => {
+        setLoading(true);
         try {
-            setLoading(true);
             const response = await api.get("/user/directoratesfornewuser");
             const data = response.data;
 
@@ -113,6 +113,8 @@ const NewUser = () => {
                     `/user/${editingItem._id}`,
                     submitData
                 );
+                setIsEditing(false);
+                setEditingItem(null);
             } else {
                 if (!userForm.password) {
                     toast.error("Please fill all required fields");
@@ -133,15 +135,13 @@ const NewUser = () => {
                 role: null,
                 directorate: null,
             });
-            setIsEditing(false);
-            setEditingItem(null);
         } catch (error) {
             toast.error(
                 error.response?.data?.message ||
                     "Error creating user. Please try again."
             );
         } finally {
-            setLoading(false); // Fixed: should be setLoading(false)
+            setLoading(false);
         }
     };
 
@@ -156,6 +156,16 @@ const NewUser = () => {
             directorate: null,
         });
     };
+
+    // new useEffect for removing the isEditing and editingItem when unmount
+    // useEffect(() => {
+    //     return () => {
+    //         if (!loading) {
+    //             setIsEditing(false);
+    //             setEditingItem(false);
+    //         }
+    //     };
+    // }, [loading]);
 
     return (
         <div className="new-user">

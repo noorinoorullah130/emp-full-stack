@@ -22,6 +22,7 @@ const NewDepartment = () => {
 
     // For Admin
     const fetchAllDirectoratesForNewDepartment = async () => {
+        setLoading(true)
         try {
             const response = await api.get("/user/directoratesfornewuser");
             const data = await response.data;
@@ -70,15 +71,16 @@ const NewDepartment = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setLoading(true);
-
+        
         // Prepare the data
         const setData = {
             dptName: dptForm.dptName,
             dptManager: dptForm.dptManager,
             directorate: dptForm?.directorate?.value,
         };
-
+        
+        setLoading(true);
+        
         let response;
 
         try {
@@ -118,6 +120,16 @@ const NewDepartment = () => {
             directorate: null,
         });
     };
+
+    // new useEffect for removing the isEditing and editingItem when unmount
+    // useEffect(() => {
+    //     return () => {
+    //         if (!loading) {
+    //             setIsEditing(false);
+    //             setEditingItem(false);
+    //         }
+    //     };
+    // }, [loading]);
 
     return (
         <div className="new-department">

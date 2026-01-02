@@ -37,15 +37,14 @@ const NewDirectorate = () => {
                     `/directorate/${editingItem.dirId}`,
                     dirForm
                 );
+                setIsEditing(false);
+                setEditingItem(null);
             } else {
                 response = await api.post("/directorate", dirForm);
             }
 
             toast.success(response?.data?.message);
-
             setDirForm({ dirCode: "", dirName: "" });
-            setIsEditing(false);
-            setEditingItem(null);
         } catch (error) {
             toast.error(
                 error.response?.data?.message || "Something went wrong!"
@@ -60,6 +59,16 @@ const NewDirectorate = () => {
         setEditingItem(null);
         setDirForm({ dirCode: "", dirName: "" });
     };
+
+    // new useEffect for removing the isEditing and editingItem when unmount
+    // useEffect(() => {
+    //     return () => {
+    //         if (!loading) {
+    //             setIsEditing(false);
+    //             setEditingItem(false);
+    //         }
+    //     };
+    // }, [loading]);
 
     return (
         <div className="new-directorate">

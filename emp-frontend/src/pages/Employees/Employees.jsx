@@ -17,9 +17,7 @@ const Employees = () => {
     const {
         showConfirmationBox,
         setShowConfirmationBox,
-        isEditing,
         setIsEditing,
-        editingItem,
         setEditingItem,
     } = useContext(AppContext);
 
@@ -72,12 +70,12 @@ const Employees = () => {
             const data = response.data;
 
             toast.success(data?.message);
-            fetchAllEmployees();
+            await fetchAllEmployees();
+            setShowConfirmationBox(false);
         } catch (error) {
             toast.error(error.response?.data?.message);
             console.log(error.response);
         } finally {
-            setShowConfirmationBox(false);
             setLoading(false);
         }
     };

@@ -9,48 +9,60 @@ function calculateSalary(grade, step) {
             return 38000;
         case "a - 2":
             return 40000;
-        case "A-3":
+        case "a - 3":
             return 42000;
-        case "A-4":
+        case "a - 4":
             return 44000;
-        case "A-5":
+        case "a - 5":
             return 50000;
 
         // --- Grade 2 ---
-        case "2-1":
+        case "b - 1":
             return 28000;
-        case "2-2":
+        case "b - 2":
             return 30000;
-        case "2-3":
+        case "b - 3":
             return 32000;
-        case "2-4":
+        case "b - 4":
             return 34000;
-        case "2-5":
+        case "b - 5":
             return 36000;
 
         // --- Grade 3 ---
-        case "3-1":
+        case "c - 1":
             return 18000;
-        case "3-2":
+        case "c - 2":
             return 20000;
-        case "3-3":
+        case "c - 3":
             return 22000;
-        case "3-4":
+        case "c - 4":
             return 24000;
-        case "3-5":
+        case "c - 5":
             return 26000;
 
         // --- Grade 4 ---
-        case "4-1":
+        case "d - 1":
             return 8000;
-        case "4-2":
+        case "d - 2":
             return 10000;
-        case "4-3":
+        case "d - 3":
             return 12000;
-        case "4-4":
+        case "d - 4":
             return 14000;
-        case "4-5":
+        case "d - 5":
             return 16000;
+
+        // Support Grades
+        case "e - 1":
+            return 12000;
+        case "e - 2":
+            return 14000;
+        case "e - 3":
+            return 16000;
+        case "e - 4":
+            return 18000;
+        case "e - 5":
+            return 20000;
         default:
             return "Invalid grade or step!";
     }

@@ -28,9 +28,8 @@ const Departments = () => {
     } = useContext(AppContext);
 
     const fetchAllDepartments = async () => {
+        setLoading(true);
         try {
-            setLoading(true);
-
             const response = await api.get(
                 `/department?page=${currentPage}&limit=${limit}`
             );
@@ -71,19 +70,21 @@ const Departments = () => {
     };
 
     const confirmDelete = async () => {
+        setLoading(true);
         try {
-            setLoading(true);
             const response = await api.delete(`/department/${deleteId}`);
             toast.success(response?.data?.message);
-            fetchAllDepartments();
+
+            await fetchAllDepartments();
+
+            setDeleteId(null);
+            setShowConfirmationBox(false);
         } catch (error) {
             toast.error(
                 error.response?.data?.message || "Failed to delete Department!"
             );
         } finally {
             setLoading(false);
-            setDeleteId(null);
-            setShowConfirmationBox(false);
         }
     };
 

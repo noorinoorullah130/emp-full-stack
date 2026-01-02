@@ -18,7 +18,7 @@ const AllDirectorates = () => {
     const [deleteId, setDeleteId] = useState(null);
 
     const navigate = useNavigate();
-    
+
     const {
         showConfirmationBox,
         setShowConfirmationBox,
@@ -27,8 +27,8 @@ const AllDirectorates = () => {
     } = useContext(AppContext);
 
     const getAllDirectoratesData = async () => {
+        setLoading(true);
         try {
-            setLoading(true);
             const response = await api.get("/directorate", {
                 params: { page: currentPage, limit },
             });
@@ -82,19 +82,21 @@ const AllDirectorates = () => {
     };
 
     const confirmDelete = async () => {
+        setLoading(true);
         try {
-            setLoading(true);
             const response = await api.delete(`/directorate/${deleteId}`);
             toast.success(response?.data?.message);
+
             await getAllDirectoratesData();
+
+            setDeleteId(null);
+            setShowConfirmationBox(false);
         } catch (error) {
             toast.error(
                 error.response?.data?.message || "Failed to delete directorate!"
             );
         } finally {
             setLoading(false);
-            setDeleteId(null);
-            setShowConfirmationBox(false);
         }
     };
 

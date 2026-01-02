@@ -70,25 +70,28 @@ const AllUsers = () => {
     };
 
     const confirmDelete = async () => {
+        setLoading(true);
         try {
-            setLoading(true);
             const response = await api.delete(`/user/${deleteId}`);
             toast.success(response?.data?.message);
+
             await fetchAllUsers();
+
+            setDeleteId(null);
+            setShowConfirmationBox(false);
         } catch (error) {
             toast.error(
                 error.response?.data?.message || "Failed to delete user!"
             );
         } finally {
             setLoading(false);
-            setDeleteId(null);
-            setShowConfirmationBox(false);
         }
     };
 
     const handleEdit = (user) => {
         setIsEditing(true);
         setEditingItem(user);
+        console.log(user);
         navigate("/app/newuser");
     };
 

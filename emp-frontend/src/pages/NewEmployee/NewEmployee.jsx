@@ -57,6 +57,7 @@ const NewEmployee = () => {
 
     // ====== Fetch directorates for admin ======
     const fetchAllDirectoratesForNewEmployee = async () => {
+        setLoading(true);
         try {
             const response = await api.get("/user/directoratesfornewuser");
             const data = response.data;
@@ -72,20 +73,20 @@ const NewEmployee = () => {
             toast.error(
                 error.response?.data?.message || "Something went wrong!"
             );
+        } finally {
+            setLoading(false);
         }
     };
 
     useEffect(() => {
-        if (role === "admin") {
-            setLoading(true);
-            fetchAllDirectoratesForNewEmployee().finally(() =>
-                setLoading(false)
-            );
+        if (role === "admin" && !isEditing && !editingItem) {
+            fetchAllDirectoratesForNewEmployee();
         }
     }, [role]);
 
     // ====== Fetch departments when directorate changes ======
     const fetchAllDepartmentsForNewEmployee = async (dirId) => {
+        setLoading(true);
         try {
             const response = await api.get(
                 `/employee/departmentsfornewemployee?directorateId=${dirId}`
@@ -101,15 +102,14 @@ const NewEmployee = () => {
             toast.error(
                 error.response?.data?.message || "Something went wrong!"
             );
+        } finally {
+            setLoading(false);
         }
     };
 
     useEffect(() => {
-        if (selectedDirId) {
-            setLoading(true);
-            fetchAllDepartmentsForNewEmployee(selectedDirId).finally(() =>
-                setLoading(false)
-            );
+        if (selectedDirId && !isEditing && !editingItem) {
+            fetchAllDepartmentsForNewEmployee(selectedDirId);
         }
     }, [selectedDirId]);
 
@@ -119,8 +119,14 @@ const NewEmployee = () => {
             setEmpForm({
                 name: editingItem.name,
                 fName: editingItem.fName,
-                grade: editingItem.grade,
-                step: editingItem.step,
+                grade: {
+                    value: editingItem.grade,
+                    label: formatText(editingItem.grade),
+                },
+                step: {
+                    value: editingItem.step,
+                    label: formatText(editingItem.step),
+                },
                 experience: editingItem.experience,
                 idNumber: editingItem.idNumber,
                 directorate: editingItem.directorate,
@@ -274,6 +280,16 @@ const NewEmployee = () => {
             hireDate: null,
         });
     };
+
+    // new useEffect for removing the isEditing and editingItem when unmount
+    // useEffect(() => {
+    //     return () => {
+    //         if (!loading) {
+    //             setIsEditing(false);
+    //             setEditingItem(false);
+    //         }
+    //     };
+    // }, [loading]);
 
     return (
         <div className="new-employee">
