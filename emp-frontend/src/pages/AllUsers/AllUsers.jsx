@@ -75,10 +75,10 @@ const AllUsers = () => {
             const response = await api.delete(`/user/${deleteId}`);
             toast.success(response?.data?.message);
 
-            await fetchAllUsers();
-
             setDeleteId(null);
             setShowConfirmationBox(false);
+
+            await fetchAllUsers();
         } catch (error) {
             toast.error(
                 error.response?.data?.message || "Failed to delete user!"

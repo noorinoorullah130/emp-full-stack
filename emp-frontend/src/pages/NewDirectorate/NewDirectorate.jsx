@@ -29,9 +29,14 @@ const NewDirectorate = () => {
         e.preventDefault();
         setLoading(true);
 
-        try {
-            let response;
+        if (!dirForm.dirCode || !dirForm.dirName) {
+            toast.error("Please fill all required fields with valid data!");
+            return;
+        }
 
+        let response;
+
+        try {
             if (isEditing && editingItem) {
                 response = await api.put(
                     `/directorate/${editingItem.dirId}`,

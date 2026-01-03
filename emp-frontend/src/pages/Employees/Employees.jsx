@@ -68,10 +68,12 @@ const Employees = () => {
         try {
             const response = await api.delete(`/employee/${deleteId}`);
             const data = response.data;
-
             toast.success(data?.message);
-            await fetchAllEmployees();
+
             setShowConfirmationBox(false);
+            setDeleteId(null);
+
+            await fetchAllEmployees();
         } catch (error) {
             toast.error(error.response?.data?.message);
             console.log(error.response);
@@ -129,8 +131,8 @@ const Employees = () => {
                                 <td>{i + 1}</td>
                                 <td>{formatText(emp.name)}</td>
                                 <td>{formatText(emp.fName)}</td>
-                                <td>{emp.grade}</td>
-                                <td>{emp.step}</td>
+                                <td>{formatText(emp.grade)}</td>
+                                <td>{formatText(emp.step)}</td>
                                 <td>{emp.salary.toLocaleString()}</td>
                                 <td>{emp.experience}</td>
                                 {role === "admin" && (

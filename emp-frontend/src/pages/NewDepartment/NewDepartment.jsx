@@ -22,7 +22,7 @@ const NewDepartment = () => {
 
     // For Admin
     const fetchAllDirectoratesForNewDepartment = async () => {
-        setLoading(true)
+        setLoading(true);
         try {
             const response = await api.get("/user/directoratesfornewuser");
             const data = await response.data;
@@ -34,8 +34,8 @@ const NewDepartment = () => {
                 };
             });
             setAllDirectorates(options);
-            console.log(data);
-            console.log(options);
+            // console.log(data);
+            // console.log(options);
         } catch (error) {
             toast.error(error.response?.data?.message || "Something is wrong!");
             console.log(error.response);
@@ -45,10 +45,10 @@ const NewDepartment = () => {
     };
 
     useEffect(() => {
-        if (role === "admin") {
+        if (role === "admin" && !isEditing && !editingItem) {
             fetchAllDirectoratesForNewDepartment();
         }
-    }, []);
+    }, [role]);
 
     useEffect(() => {
         if (isEditing && editingItem) {
@@ -71,16 +71,21 @@ const NewDepartment = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        
+
+        if (!dptForm.dptName || !dptForm.dptManager) {
+            toast.error("Please fill all required fields with valid data!");
+            return;
+        }
+
         // Prepare the data
         const setData = {
             dptName: dptForm.dptName,
             dptManager: dptForm.dptManager,
             directorate: dptForm?.directorate?.value,
         };
-        
+
         setLoading(true);
-        
+
         let response;
 
         try {

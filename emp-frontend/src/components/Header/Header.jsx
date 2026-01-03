@@ -2,6 +2,7 @@ import React from "react";
 
 import "./Header.css";
 import { getTokenAndRole } from "../../utils/auth";
+import formatText from "../../utils/formatText";
 
 const Header = () => {
     const { directorate, role, username } = getTokenAndRole();
@@ -24,15 +25,15 @@ const Header = () => {
                         Human Resource Management System -{" "}
                         {role === "admin"
                             ? "All Directorates(Admin)"
-                            : `Directorate of ${directorate}`}
+                            : `Directorate of ${formatText(directorate)}`}
                     </h1>
                 </div>
 
                 <div className="header-right">
                     <div className="user-profile">
-                        <div className="avatar">{userInitials}</div>
-                        <span className="username">{username}</span>
-                        <span className="user-role">{role}</span>
+                        <div className="avatar">{formatText(userInitials)}</div>
+                        <span className="username">{formatText(username)}</span>
+                        <span className="user-role">{formatText(role)}</span>
                     </div>
                 </div>
             </div>

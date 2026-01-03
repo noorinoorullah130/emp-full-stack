@@ -1,5 +1,7 @@
 const Directorate = require("../models/directorate");
 const Employee = require("../models/employee");
+const Department = require("../models/department");
+const User = require("../models/user");
 
 const addNewDirectorate = async (req, res) => {
     try {
@@ -54,6 +56,29 @@ const getAllDirectorates = async (req, res) => {
         if (!allDirectorates)
             return res.status(404).json({ message: "No data availabel!" });
 
+        const allDepartments = await Department.find();
+        const allEmployees = await Employee.find();
+
+        const allDirectoratesWithDetails = allDirectorates.map((dir) => {
+            const dptsInOneDir = allDepartments.map((dpt) => dpt);
+
+            const empsInOneDir = allEmployees.map((emp) => emp);
+
+            const salaryInOneDir = allEmployees.reduce(
+                (acc, emp) => acc + emp.salary,
+                0
+            );
+
+            return {
+                ...dir.toObject(),
+                allDepartments: dptsInOneDir,
+                allEmployees: empsInOneDir,
+                totalSalary: salaryInOneDir,
+            };
+        });
+
+        console.log(allDirectoratesWithDetails);
+
         const totalDirectorates = await Directorate.countDocuments();
 
         const empPerDirectorate = await Promise.all(
@@ -80,6 +105,7 @@ const getAllDirectorates = async (req, res) => {
 
         res.status(200).json({
             allDirectorates,
+            allDirectoratesWithDetails,
             page,
             limit,
             skip,
@@ -126,6 +152,33 @@ const updateDirectorate = async (req, res) => {
 const deleteDirectorate = async (req, res) => {
     try {
         const id = req.params.id;
+
+        // for employees
+        const allEmployees = await Employee.find({ directorate: id });
+
+        if (allEmployees.length > 0) {
+            return res.status(400).json({
+                message: `This directorate has employees to delete first, then you can delete the directorate! Total employees in this Directorate are: ${allEmployees.length}`,
+            });
+        }
+
+        // for departments
+        const allDepartments = await Department.find({ directorate: id });
+
+        if (allDepartments.length > 0) {
+            return res.status(400).json({
+                message: `This directorate has departments to delete first, then you can delete the directorate! Total departments in this Directorate are: ${allDepartments.length}`,
+            });
+        }
+
+        // for users
+        const allUsers = await User.find({ directorate: id });
+
+        if (allUsers.length > 0) {
+            return res.status(400).json({
+                message: `This directorate has users to delete first, then you can delete the directorate! Total users in this Directorate are: ${allUsers.length}`,
+            });
+        }
 
         const deletedDirectorate = await Directorate.findByIdAndDelete(id);
 

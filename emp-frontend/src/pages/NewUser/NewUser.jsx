@@ -92,7 +92,7 @@ const NewUser = () => {
             !userForm.role ||
             !userForm.directorate
         ) {
-            toast.error("Please fill all required fields");
+            toast.error("Please fill all required fields with valid data!");
             return;
         }
 
@@ -117,7 +117,9 @@ const NewUser = () => {
                 setEditingItem(null);
             } else {
                 if (!userForm.password) {
-                    toast.error("Please fill all required fields");
+                    toast.error(
+                        "Please fill all required fields with valid data!"
+                    );
                     return;
                 }
                 (submitData.password = userForm.password),

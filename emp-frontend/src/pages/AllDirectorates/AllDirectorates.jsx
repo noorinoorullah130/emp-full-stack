@@ -7,6 +7,7 @@ import AppContext from "../../context/AppContext";
 import { useNavigate } from "react-router-dom";
 import formatText from "../../utils/formatText";
 import ConfirmationBox from "../../components/ConfirmationBox/ConfirmationBox";
+import formatTotalSalary from "../../utils/formatTotalSalary";
 
 const AllDirectorates = () => {
     const [allDirectorates, setAllDirectorates] = useState([]);
@@ -34,6 +35,8 @@ const AllDirectorates = () => {
             });
 
             const data = response.data;
+            console.log(data)
+
             setAllDirectorates(data.allDirectorates);
             setAllDirectoratesDetails(data.empPerDirectorate);
             setTotalDirectorates(data.totalDirectorates);
@@ -87,10 +90,10 @@ const AllDirectorates = () => {
             const response = await api.delete(`/directorate/${deleteId}`);
             toast.success(response?.data?.message);
 
-            await getAllDirectoratesData();
-
-            setDeleteId(null);
             setShowConfirmationBox(false);
+            setDeleteId(null);
+
+            await getAllDirectoratesData();
         } catch (error) {
             toast.error(
                 error.response?.data?.message || "Failed to delete directorate!"
@@ -139,7 +142,9 @@ const AllDirectorates = () => {
                                 <td>{formatText(dir.dirName)}</td>
                                 <td>{dir.employeeCountPerDirectorate}</td>
                                 <td>
-                                    {dir.totalSalaryPerDirectorate.toLocaleString()}
+                                    {formatTotalSalary(
+                                        dir.totalSalaryPerDirectorate
+                                    )}
                                 </td>
                                 <td className="action-buttons">
                                     <button

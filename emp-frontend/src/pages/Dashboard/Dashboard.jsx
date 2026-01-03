@@ -31,6 +31,7 @@ import {
 import "./Dashboard.css";
 import api from "../../utils/api";
 import { getTokenAndRole } from "../../utils/auth";
+import formatTotalSalary from "../../utils/formatTotalSalary";
 
 const Dashboard = () => {
     const [dashboardDetails, setDashboardDetails] = useState({
@@ -206,17 +207,7 @@ const Dashboard = () => {
                     </div>
                     <div className="stat-info">
                         <h3>Total Employees Salary</h3>
-                        <p>
-                            {dashboardDetails.totalSalary >= 1000000
-                                ? `${(
-                                      dashboardDetails.totalSalary / 1000000
-                                  ).toFixed(1)}M`
-                                : dashboardDetails.totalSalary >= 1000
-                                ? `${(
-                                      dashboardDetails.totalSalary / 1000
-                                  ).toFixed(1)}K`
-                                : dashboardDetails.totalSalary}
-                        </p>
+                        <p>{formatTotalSalary(dashboardDetails.totalSalary)}</p>
                     </div>
                 </div>
             </div>

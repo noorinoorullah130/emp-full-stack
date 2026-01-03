@@ -8,6 +8,7 @@ import AppContext from "../../context/AppContext";
 import ConfirmationBox from "../../components/ConfirmationBox/ConfirmationBox";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
+import formatTotalSalary from "../../utils/formatTotalSalary";
 
 const Departments = () => {
     const [allDepartments, setAllDepartments] = useState([]);
@@ -35,7 +36,6 @@ const Departments = () => {
             );
 
             const data = await response.data;
-            console.log(data);
 
             setAllDepartments(data.allDpts);
             setAllDepartmentsDetails(data.empPerDepartments);
@@ -53,7 +53,7 @@ const Departments = () => {
 
     const fullAllDepartmentsDetails = allDepartments.map((dpt) => {
         const detail = allDepartmentsDetail.find(
-            (d) => d.dptName === dpt.dptName
+            (d) => d.department === dpt.dptName
         );
 
         return {
@@ -75,10 +75,10 @@ const Departments = () => {
             const response = await api.delete(`/department/${deleteId}`);
             toast.success(response?.data?.message);
 
-            await fetchAllDepartments();
-
             setDeleteId(null);
             setShowConfirmationBox(false);
+
+            await fetchAllDepartments();
         } catch (error) {
             toast.error(
                 error.response?.data?.message || "Failed to delete Department!"
@@ -133,7 +133,9 @@ const Departments = () => {
                                 <td>{formatText(dept.dptName)}</td>
                                 <td>{formatText(dept.dptManager)}</td>
                                 <td>{dept.employeeCountPerDpt}</td>
-                                <td>{dept.totalSalaryPerDpt}</td>
+                                <td>
+                                    {formatTotalSalary(dept.totalSalaryPerDpt)}
+                                </td>
                                 <td className="action-buttons">
                                     <button
                                         className="edit-btn"

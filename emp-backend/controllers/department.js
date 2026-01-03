@@ -155,6 +155,13 @@ const deleteDpt = async (req, res) => {
     try {
         const id = req.params.id;
 
+        const allEmployees = await Employee.find({ department: id });
+
+        if (allEmployees.length > 0)
+            return res.status(400).json({
+                message: `This department has employees to delete first, then you can delete the department! Total Employees in this Department are: ${allEmployees.length}`,
+            });
+
         const deletedDpt = await Department.findByIdAndDelete(id);
 
         if (!deletedDpt)
