@@ -11,7 +11,6 @@ import formatTotalSalary from "../../utils/formatTotalSalary";
 
 const AllDirectorates = () => {
     const [allDirectorates, setAllDirectorates] = useState([]);
-    const [allDirectoratesDetail, setAllDirectoratesDetails] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
     const [limit, setLimit] = useState(10);
     const [totalDirectorates, setTotalDirectorates] = useState(0);
@@ -35,11 +34,10 @@ const AllDirectorates = () => {
             });
 
             const data = response.data;
-            console.log(data)
+            console.log(data);
 
-            setAllDirectorates(data.allDirectorates);
-            setAllDirectoratesDetails(data.empPerDirectorate);
-            setTotalDirectorates(data.totalDirectorates);
+            setAllDirectorates(data.allDirectoratesWithDetails);
+            setTotalDirectorates(data.totalDirectorates)
         } catch (error) {
             toast.error(
                 error.response?.data?.message || "Failed to fetch data"
@@ -52,22 +50,6 @@ const AllDirectorates = () => {
     useEffect(() => {
         getAllDirectoratesData();
     }, [currentPage, limit]);
-
-    const fullAllDirectoratesDetails = allDirectorates.map((dir) => {
-        const detail = allDirectoratesDetail.find(
-            (dirD) => dirD.directorate === dir.dirName
-        );
-
-        return {
-            ...dir,
-            employeeCountPerDirectorate: detail
-                ? detail.employeeCountPerDirectorate
-                : 0,
-            totalSalaryPerDirectorate: detail
-                ? detail.totalSalaryPerDirectorate
-                : 0,
-        };
-    });
 
     const handleEdit = async (id, dir) => {
         setIsEditing(true);
@@ -116,6 +98,7 @@ const AllDirectorates = () => {
                         <th>ID</th>
                         <th>Directorate Code</th>
                         <th>Directorate Name</th>
+                        <th>Total Departments</th>
                         <th>Total Employees</th>
                         <th>Total Salary</th>
                         <th>Actions</th>
@@ -128,22 +111,23 @@ const AllDirectorates = () => {
                                 Loading...
                             </td>
                         </tr>
-                    ) : fullAllDirectoratesDetails.length === 0 ? (
+                    ) : allDirectorates.length === 0 ? (
                         <tr>
                             <td colSpan={6} className="no-data">
                                 No Data Available!
                             </td>
                         </tr>
                     ) : (
-                        fullAllDirectoratesDetails.map((dir, i) => (
+                        allDirectorates.map((dir, i) => (
                             <tr key={dir._id || i}>
                                 <td>{i + 1}</td>
                                 <td>{dir.dirCode}</td>
                                 <td>{formatText(dir.dirName)}</td>
-                                <td>{dir.employeeCountPerDirectorate}</td>
+                                <td>{dir.allDepartmentsInDir}</td>
+                                <td>{dir.allEmployeesInDir}</td>
                                 <td>
                                     {formatTotalSalary(
-                                        dir.totalSalaryPerDirectorate
+                                        dir.totalSalaryOfDir
                                     )}
                                 </td>
                                 <td className="action-buttons">

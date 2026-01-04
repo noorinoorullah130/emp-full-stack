@@ -60,57 +60,35 @@ const getAllDirectorates = async (req, res) => {
         const allEmployees = await Employee.find();
 
         const allDirectoratesWithDetails = allDirectorates.map((dir) => {
-            const dptsInOneDir = allDepartments.map((dpt) => dpt);
+            const dptsInOneDir = allDepartments.filter((dpt) =>
+                dpt.directorate.equals(dir._id)
+            );
 
-            const empsInOneDir = allEmployees.map((emp) => emp);
+            const empsInOndeDir = allEmployees.filter((emp) =>
+                emp.directorate.equals(dir._id)
+            );
 
-            const salaryInOneDir = allEmployees.reduce(
-                (acc, emp) => acc + emp.salary,
+            const totalSalaryOfDir = empsInOndeDir.reduce(
+                (currentValue, emp) => currentValue + emp.salary,
                 0
             );
 
             return {
                 ...dir.toObject(),
-                allDepartments: dptsInOneDir,
-                allEmployees: empsInOneDir,
-                totalSalary: salaryInOneDir,
+                allDepartmentsInDir: dptsInOneDir.length,
+                allEmployeesInDir: empsInOndeDir.length,
+                totalSalaryOfDir,
             };
         });
 
-        console.log(allDirectoratesWithDetails);
-
         const totalDirectorates = await Directorate.countDocuments();
 
-        const empPerDirectorate = await Promise.all(
-            allDirectorates.map(async (dir) => {
-                const allEmployees = await Employee.find({
-                    directorate: dir._id,
-                });
-
-                const employeeCountPerDirectorate = allEmployees.length;
-
-                let totalSalaryPerDirectorate = 0;
-
-                allEmployees.forEach((emp) => {
-                    totalSalaryPerDirectorate += emp.salary;
-                });
-
-                return {
-                    directorate: dir.dirName,
-                    employeeCountPerDirectorate,
-                    totalSalaryPerDirectorate,
-                };
-            })
-        );
-
         res.status(200).json({
-            allDirectorates,
             allDirectoratesWithDetails,
             page,
             limit,
             skip,
             totalDirectorates,
-            empPerDirectorate,
         });
     } catch (error) {
         res.status(500).json({ error: error.message });

@@ -68,6 +68,21 @@ const getAllDpts = async (req, res) => {
                   .limit(limit)
                   .skip(skip);
 
+        const allEmployees = req.user.role.includes("admin")
+            ? await Employee.find()
+            : await Employee.find({ directorate: req.user.directorate });
+
+        const allDepartmentsWithDetails = allDpts.map((dpt) => {
+            const empsInOndeDpt = allEmployees.filter((emp) =>
+                emp.department.equals(dpt._id)
+            );
+
+            return {
+                ...dpt.toObject(),
+                empsInOndeDpt,
+            };
+        });
+
         const totalDpts = req.user.role.includes("admin")
             ? await Department.countDocuments()
             : await Department.countDocuments({
@@ -98,6 +113,7 @@ const getAllDpts = async (req, res) => {
 
         res.status(200).json({
             allDpts,
+            allDepartmentsWithDetails,
             page,
             limit,
             skip,
