@@ -68,18 +68,35 @@ const getAllDpts = async (req, res) => {
                   .limit(limit)
                   .skip(skip);
 
+        const allDirectorates = req.user.role.includes("admin")
+            ? await Directorate.find().select("dirName")
+            : await Directorate.find({ _id: req.user.directorate }).select(
+                  "dirName"
+              );
+
         const allEmployees = req.user.role.includes("admin")
             ? await Employee.find()
             : await Employee.find({ directorate: req.user.directorate });
 
         const allDepartmentsWithDetails = allDpts.map((dpt) => {
-            const empsInOndeDpt = allEmployees.filter((emp) =>
+            const dptDirectorate = allDirectorates.find((dir) =>
+                dir._id.equals(dpt.directorate)
+            );
+
+            const empsInOneDpt = allEmployees.filter((emp) =>
                 emp.department.equals(dpt._id)
+            );
+
+            const totalSalaryOfDpt = empsInOneDpt.reduce(
+                (currentValue, emp) => currentValue + emp.salary,
+                0
             );
 
             return {
                 ...dpt.toObject(),
-                empsInOndeDpt,
+                dptDirectorate: dptDirectorate.dirName,
+                empsInOneDpt: empsInOneDpt.length,
+                totalSalaryOfDpt,
             };
         });
 
@@ -89,36 +106,12 @@ const getAllDpts = async (req, res) => {
                   directorate: req.user.directorate,
               });
 
-        const empPerDepartments = await Promise.all(
-            allDpts.map(async (dpt) => {
-                const allEmployees = await Employee.find({
-                    department: dpt._id,
-                });
-
-                const employeeCountPerDpt = allEmployees.length;
-
-                let totalSalaryPerDpt = 0;
-
-                allEmployees.forEach((emp) => {
-                    totalSalaryPerDpt = totalSalaryPerDpt + emp.salary;
-                });
-
-                return {
-                    department: dpt.dptName,
-                    employeeCountPerDpt,
-                    totalSalaryPerDpt,
-                };
-            })
-        );
-
         res.status(200).json({
-            allDpts,
             allDepartmentsWithDetails,
             page,
             limit,
             skip,
             totalDpts,
-            empPerDepartments,
         });
     } catch (error) {
         res.status(500).json({ error: error.message });

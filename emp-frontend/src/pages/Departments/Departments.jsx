@@ -12,7 +12,6 @@ import formatTotalSalary from "../../utils/formatTotalSalary";
 
 const Departments = () => {
     const [allDepartments, setAllDepartments] = useState([]);
-    const [allDepartmentsDetail, setAllDepartmentsDetails] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
     const [limit, setLimit] = useState(10);
     const [totalDepartments, setTotalDepartments] = useState(0);
@@ -37,8 +36,7 @@ const Departments = () => {
 
             const data = await response.data;
 
-            setAllDepartments(data.allDpts);
-            setAllDepartmentsDetails(data.empPerDepartments);
+            setAllDepartments(data.allDepartmentsWithDetails);
             setTotalDepartments(data.totalDpts);
         } catch (error) {
             console.log(error);
@@ -50,18 +48,6 @@ const Departments = () => {
     useEffect(() => {
         fetchAllDepartments();
     }, [currentPage, limit]);
-
-    const fullAllDepartmentsDetails = allDepartments.map((dpt) => {
-        const detail = allDepartmentsDetail.find(
-            (d) => d.department === dpt.dptName
-        );
-
-        return {
-            ...dpt,
-            employeeCountPerDpt: detail ? detail.employeeCountPerDpt : 0,
-            totalSalaryPerDpt: detail ? detail.totalSalaryPerDpt : 0,
-        };
-    });
 
     const handleDelete = (id) => {
         setDeleteId(id);
@@ -108,6 +94,7 @@ const Departments = () => {
                         <th>ID</th>
                         <th>Department Name</th>
                         <th>Manager</th>
+                        <th>Directorate</th>
                         <th>Employees</th>
                         <th>Total Salary</th>
                         <th>Actions</th>
@@ -120,21 +107,22 @@ const Departments = () => {
                                 Loading...
                             </td>
                         </tr>
-                    ) : fullAllDepartmentsDetails.length === 0 ? (
+                    ) : allDepartments.length === 0 ? (
                         <tr>
                             <td colSpan={6} className="no-data">
                                 No Data Available!
                             </td>
                         </tr>
                     ) : (
-                        fullAllDepartmentsDetails.map((dept, i) => (
+                        allDepartments.map((dept, i) => (
                             <tr key={dept._id}>
                                 <td>{i + 1}</td>
                                 <td>{formatText(dept.dptName)}</td>
                                 <td>{formatText(dept.dptManager)}</td>
-                                <td>{dept.employeeCountPerDpt}</td>
+                                <td>{formatText(dept.dptDirectorate)}</td>
+                                <td>{dept.empsInOneDpt}</td>
                                 <td>
-                                    {formatTotalSalary(dept.totalSalaryPerDpt)}
+                                    {formatTotalSalary(dept.totalSalaryOfDpt)}
                                 </td>
                                 <td className="action-buttons">
                                     <button
