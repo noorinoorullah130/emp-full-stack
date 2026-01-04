@@ -9,3 +9,4 @@ Technologies:
 Problems in project:
 
 1. In Dashboard, instead of how many user, i bring directorates
+2. how to fetch data for user and admin

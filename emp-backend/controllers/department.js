@@ -13,15 +13,6 @@ const addNewDpt = async (req, res) => {
                 .json({ message: "Required fields are missing!" });
         }
 
-        const isDepartmentExist = await Department.findOne({
-            dptName: dptName,
-        });
-
-        if (isDepartmentExist)
-            return res
-                .status(400)
-                .json({ message: "Department already existed!" });
-
         let directorateIdFromAdmin;
 
         if (req.user.role.includes("admin")) {
@@ -34,6 +25,16 @@ const addNewDpt = async (req, res) => {
                     message: "Directorate id has not comes from admin!",
                 });
         }
+
+        const isDepartmentExist = await Department.findOne({
+            dptName: dptName,
+            directorate: directorateIdFromUser || directorateIdFromAdmin,
+        });
+
+        if (isDepartmentExist)
+            return res
+                .status(400)
+                .json({ message: "Department already existed!" });
 
         const dptData = {
             dptName,

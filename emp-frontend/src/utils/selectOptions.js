@@ -19,7 +19,7 @@ const allGrades = [
         label: "B - Assistant",
     },
     {
-        value: "c - canager",
+        value: "c - manager",
         label: "C - Manager",
     },
     {

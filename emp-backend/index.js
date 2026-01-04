@@ -30,7 +30,7 @@ app.use("/api/department", dptRoutes);
 app.use("/api/employee", empRoutes);
 app.use("/api/setting", settingRoutes);
 
-// app.use("/api/aggregate", aggregateMethod);
+app.use("/api/aggregate", aggregateMethod);
 
 const PORT = process.env.PORT || 5000;
 
