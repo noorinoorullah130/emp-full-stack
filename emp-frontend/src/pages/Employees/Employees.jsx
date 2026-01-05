@@ -136,9 +136,11 @@ const Employees = () => {
                                 <td>{emp.salary.toLocaleString()}</td>
                                 <td>{emp.experience}</td>
                                 {role === "admin" && (
-                                    <td>{formatText(emp.directorate)}</td>
+                                    <td>
+                                        {formatText(emp.directorate.dirName)}
+                                    </td>
                                 )}
-                                <td>{formatText(emp.department)}</td>
+                                <td>{formatText(emp.department.dptName)}</td>
                                 <td>{emp.hireDate}</td>
                                 <td className="action-buttons">
                                     <button

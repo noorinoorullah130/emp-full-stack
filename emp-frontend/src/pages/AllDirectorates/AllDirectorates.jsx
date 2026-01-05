@@ -36,8 +36,8 @@ const AllDirectorates = () => {
             const data = response.data;
             console.log(data);
 
-            setAllDirectorates(data.allDirectoratesWithDetails);
-            setTotalDirectorates(data.totalDirectorates)
+            setAllDirectorates(data.allDirectorates);
+            setTotalDirectorates(data.totalDirectorates);
         } catch (error) {
             toast.error(
                 error.response?.data?.message || "Failed to fetch data"
@@ -123,13 +123,9 @@ const AllDirectorates = () => {
                                 <td>{i + 1}</td>
                                 <td>{dir.dirCode}</td>
                                 <td>{formatText(dir.dirName)}</td>
-                                <td>{dir.allDepartmentsInDir}</td>
-                                <td>{dir.allEmployeesInDir}</td>
-                                <td>
-                                    {formatTotalSalary(
-                                        dir.totalSalaryOfDir
-                                    )}
-                                </td>
+                                <td>{dir.departmentCount}</td>
+                                <td>{dir.employeeCount}</td>
+                                <td>{formatTotalSalary(dir.totalSalary)}</td>
                                 <td className="action-buttons">
                                     <button
                                         className="edit-btn"

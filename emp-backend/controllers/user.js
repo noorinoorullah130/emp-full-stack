@@ -56,19 +56,13 @@ const getAllUsers = async (req, res) => {
             .select("-password")
             .sort({ _id: -1 })
             .limit(limit)
-            .skip(skip);
-
-        const allDirectorates = await Directorate.find()
-            .sort({ _id: -1 })
-            .limit(limit)
             .skip(skip)
-            .select("dirName");
+            .populate("directorate", "dirName");
 
         const totalUsers = await User.countDocuments();
 
         res.status(200).json({
             allUsers,
-            allDirectorates,
             page,
             limit,
             skip,

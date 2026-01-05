@@ -35,8 +35,9 @@ const Departments = () => {
             );
 
             const data = await response.data;
+            console.log(data)
 
-            setAllDepartments(data.allDepartmentsWithDetails);
+            setAllDepartments(data.allDpts);
             setTotalDepartments(data.totalDpts);
         } catch (error) {
             console.log(error);
@@ -119,10 +120,10 @@ const Departments = () => {
                                 <td>{i + 1}</td>
                                 <td>{formatText(dept.dptName)}</td>
                                 <td>{formatText(dept.dptManager)}</td>
-                                <td>{formatText(dept.dptDirectorate)}</td>
-                                <td>{dept.empsInOneDpt}</td>
+                                <td>{formatText(dept.directorate[0])}</td>
+                                <td>{dept.employeeCount}</td>
                                 <td>
-                                    {formatTotalSalary(dept.totalSalaryOfDpt)}
+                                    {formatTotalSalary(dept.totalSalary)}
                                 </td>
                                 <td className="action-buttons">
                                     <button

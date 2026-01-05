@@ -26,15 +26,20 @@ router.get("/", async (req, res) => {
             (emp) => new Date(emp.hireDate) >= fiveDaysAgo
         );
 
+        const allDepartmentsWithDetails = await Department.aggregate([]).sort({
+            _id: -1,
+        });
+
         res.status(200).json({
             message: "Start!",
-            allUsers,
-            allDirectorates,
-            allDepartments,
-            totalEMployees: allEmployees.length,
-            totalEmployeesSalary,
-            newEmpsInTheLastFiveDays: newEmpsInTheLastFiveDays.length,
-            fiveDaysAgo: typeof fiveDaysAgo,
+            // allUsers,
+            // allDirectorates,
+            // allDepartments,
+            // totalEMployees: allEmployees.length,
+            // totalEmployeesSalary,
+            // newEmpsInTheLastFiveDays: newEmpsInTheLastFiveDays.length,
+            // fiveDaysAgo: typeof fiveDaysAgo,
+            allDepartmentsWithDetails,
         });
     } catch (error) {
         res.status(500).json({ error: error.message });

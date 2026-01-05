@@ -11,7 +11,6 @@ import { useNavigate } from "react-router-dom";
 
 const AllUsers = () => {
     const [allUsers, setAllUsers] = useState([]);
-    const [allDirectorates, setAllDirectorates] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
     const [limit, setLimit] = useState(10);
     const [totalUsers, setTotalUsers] = useState(0);
@@ -36,7 +35,6 @@ const AllUsers = () => {
             const data = await response.data;
 
             setAllUsers(data.allUsers);
-            setAllDirectorates(data.allDirectorates);
             setTotalUsers(data.totalUsers);
         } catch (error) {
             toast.error(
@@ -50,19 +48,6 @@ const AllUsers = () => {
     useEffect(() => {
         fetchAllUsers();
     }, [currentPage, limit]);
-
-    const fullAllUserDetails = allUsers.map((user) => {
-        const isUserHasDirectorate = allDirectorates.find(
-            (dir) => dir._id === user.directorate
-        );
-
-        return {
-            ...user,
-            directorate: isUserHasDirectorate
-                ? isUserHasDirectorate.dirName
-                : "",
-        };
-    });
 
     const handleDelete = (id) => {
         setDeleteId(id);
@@ -120,19 +105,24 @@ const AllUsers = () => {
                                 Loading...
                             </td>
                         </tr>
-                    ) : fullAllUserDetails.length === 0 ? (
+                    ) : allUsers.length === 0 ? (
                         <tr>
                             <td colSpan={6} className="no-data">
                                 No Data Available!
                             </td>
                         </tr>
                     ) : (
-                        fullAllUserDetails.map((user, i) => (
+                        allUsers.map((user, i) => (
                             <tr key={user._id}>
                                 <td>{i + 1}</td>
                                 <td>{formatText(user.name)}</td>
                                 <td>{user.email}</td>
-                                <td>{formatText(user.directorate)}</td>
+                                <td>
+                                    {formatText(
+                                        user?.directorate?.dirName ||
+                                            "All Directorates"
+                                    )}
+                                </td>
                                 <td>{formatText(user.role[0])}</td>
                                 <td className="action-buttons">
                                     <button

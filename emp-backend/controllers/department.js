@@ -61,45 +61,107 @@ const getAllDpts = async (req, res) => {
         const skip = (page - 1) * limit;
 
         const allDpts = req.user.role.includes("admin")
-            ? await Department.find().sort({ _id: -1 }).limit(limit).skip(skip)
-            : await Department.find({
-                  directorate: req.user.directorate,
-              })
+            ? await Department.aggregate([
+                  {
+                      $lookup: {
+                          from: "employees",
+                          localField: "_id",
+                          foreignField: "department",
+                          as: "employees",
+                      },
+                  },
+                  {
+                      $lookup: {
+                          from: "directorates",
+                          localField: "directorate",
+                          foreignField: "_id",
+                          as: "directorates",
+                      },
+                  },
+                  {
+                      $project: {
+                          dptName: 1,
+                          dptManager: 1,
+                          directorate: "$directorates.dirName",
+                          employeeCount: { $size: "$employees" },
+                          totalSalary: { $sum: "$employees.salary" },
+                      },
+                  },
+              ])
+                  .sort({ _id: -1 })
+                  .limit(limit)
+                  .skip(skip)
+            : await Department.aggregate([
+                  {
+                      $match: {
+                          directorate: ObjectId("6958a22b9a2efa032d234600"),
+                      },
+                  },
+                  {
+                      $lookup: {
+                          from: "employees",
+                          localField: "_id",
+                          foreignField: "department",
+                          as: "employees",
+                      },
+                  },
+                  {
+                      $lookup: {
+                          from: "directorates",
+                          localField: "directorate",
+                          foreignField: "_id",
+                          as: "directorates",
+                      },
+                  },
+                  {
+                      $project: {
+                          dptName: 1,
+                          dptManager: 1,
+                          directorate: "$directorates.dirName",
+                          employeeCount: {
+                              $size: "$employees",
+                          },
+                          totalSalary: {
+                              $sum: "$employees.salary",
+                          },
+                      },
+                  },
+              ])
                   .sort({ _id: -1 })
                   .limit(limit)
                   .skip(skip);
 
-        const allDirectorates = req.user.role.includes("admin")
-            ? await Directorate.find().select("dirName")
-            : await Directorate.find({ _id: req.user.directorate }).select(
-                  "dirName"
-              );
+        // const allDirectorates = req.user.role.includes("admin")
+        //     ? await Directorate.find().select("dirName")
+        //     : await Directorate.find({ _id: req.user.directorate }).select(
+        //           "dirName"
+        //       );
 
-        const allEmployees = req.user.role.includes("admin")
-            ? await Employee.find()
-            : await Employee.find({ directorate: req.user.directorate });
+        // const allEmployees = req.user.role.includes("admin")
+        //     ? await Employee.find()
+        //     : await Employee.find({ directorate: req.user.directorate });
 
-        const allDepartmentsWithDetails = allDpts.map((dpt) => {
-            const dptDirectorate = allDirectorates.find((dir) =>
-                dir._id.equals(dpt.directorate)
-            );
+        // const allDepartmentsWithDetails = allDpts.map((dpt) => {
+        //     const dptDirectorate = allDirectorates.find((dir) =>
+        //         dir._id.equals(dpt.directorate)
+        //     );
 
-            const empsInOneDpt = allEmployees.filter((emp) =>
-                emp.department.equals(dpt._id)
-            );
+        //     const empsInOneDpt = allEmployees.filter((emp) =>
+        //         emp.department.equals(dpt._id)
+        //     );
 
-            const totalSalaryOfDpt = empsInOneDpt.reduce(
-                (currentValue, emp) => currentValue + emp.salary,
-                0
-            );
+        //     const totalSalaryOfDpt = empsInOneDpt.reduce(
+        //         (currentValue, emp) => currentValue + emp.salary,
+        //         0
+        //     );
 
-            return {
-                ...dpt.toObject(),
-                dptDirectorate: dptDirectorate.dirName,
-                empsInOneDpt: empsInOneDpt.length,
-                totalSalaryOfDpt,
-            };
-        });
+        //     return {
+        //         ...dpt.toObject(),
+        //         dptDirectorate: dptDirectorate.dirName,
+        //         empsInOneDpt: empsInOneDpt.length,
+        //         totalSalaryOfDpt,
+        //     };
+        // });
 
         const totalDpts = req.user.role.includes("admin")
             ? await Department.countDocuments()
@@ -108,7 +170,7 @@ const getAllDpts = async (req, res) => {
               });
 
         res.status(200).json({
-            allDepartmentsWithDetails,
+            allDpts,
             page,
             limit,
             skip,

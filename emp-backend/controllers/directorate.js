@@ -48,7 +48,39 @@ const getAllDirectorates = async (req, res) => {
 
         const skip = (page - 1) * limit;
 
-        const allDirectorates = await Directorate.find()
+        const allDirectorates = await Directorate.aggregate([
+            {
+                $lookup: {
+                    from: "departments",
+                    localField: "_id",
+                    foreignField: "directorate",
+                    as: "departments",
+                },
+            },
+            {
+                $lookup: {
+                    from: "employees",
+                    localField: "_id",
+                    foreignField: "directorate",
+                    as: "employees",
+                },
+            },
+            {
+                $project: {
+                    dirCode: 1,
+                    dirName: 1,
+                    departmentCount: {
+                        $size: "$departments",
+                    },
+                    employeeCount: {
+                        $size: "$employees",
+                    },
+                    totalSalary: {
+                        $sum: "$employees.salary",
+                    },
+                },
+            },
+        ])
             .sort({ _id: -1 })
             .limit(limit)
             .skip(skip);
@@ -56,35 +88,10 @@ const getAllDirectorates = async (req, res) => {
         if (!allDirectorates)
             return res.status(404).json({ message: "No data availabel!" });
 
-        const allDepartments = await Department.find();
-        const allEmployees = await Employee.find();
-
-        const allDirectoratesWithDetails = allDirectorates.map((dir) => {
-            const dptsInOneDir = allDepartments.filter((dpt) =>
-                dpt.directorate.equals(dir._id)
-            );
-
-            const empsInOndeDir = allEmployees.filter((emp) =>
-                emp.directorate.equals(dir._id)
-            );
-
-            const totalSalaryOfDir = empsInOndeDir.reduce(
-                (currentValue, emp) => currentValue + emp.salary,
-                0
-            );
-
-            return {
-                ...dir.toObject(),
-                allDepartmentsInDir: dptsInOneDir.length,
-                allEmployeesInDir: empsInOndeDir.length,
-                totalSalaryOfDir,
-            };
-        });
-
         const totalDirectorates = await Directorate.countDocuments();
 
         res.status(200).json({
-            allDirectoratesWithDetails,
+            allDirectorates,
             page,
             limit,
             skip,

@@ -69,31 +69,18 @@ const getAllEmployees = async (req, res) => {
         const skip = (page - 1) * limit;
 
         const allEmployees = req.user.role.includes("admin")
-            ? await Employee.find().sort({ _id: -1 }).limit(limit).skip(skip)
+            ? await Employee.find()
+                  .sort({ _id: -1 })
+                  .limit(limit)
+                  .skip(skip)
+                  .populate("department", "dptName")
+                  .populate("directorate", "dirName")
             : await Employee.find({ directorate: req.user.directorate })
                   .sort({ _id: -1 })
                   .limit(limit)
-                  .skip(skip);
-
-        const allDirecorates = await Directorate.find();
-        const allDepartments = await Department.find();
-
-        // Combine Directorate & Department names with each Employee instead of their IDs
-        const employeesWithDirectorateName = allEmployees.map((emp) => {
-            const dir = allDirecorates.find((d) =>
-                d._id.equals(emp.directorate)
-            );
-
-            const dpt = allDepartments.find((d) =>
-                d._id.equals(emp.department)
-            );
-
-            return {
-                ...emp.toObject(),
-                directorate: dir.dirName,
-                department: dpt.dptName,
-            };
-        });
+                  .skip(skip)
+                  .populate("department", "dptName")
+                  .populate("directorate", "dirName");
 
         const totalEmployees = req.user.role.includes("admin")
             ? await Employee.countDocuments()
@@ -102,10 +89,10 @@ const getAllEmployees = async (req, res) => {
               });
 
         res.status(200).json({
+            allEmployees,
             page,
             limit,
             skip,
-            allEmployees: employeesWithDirectorateName,
             totalEmployees,
         });
     } catch (error) {
