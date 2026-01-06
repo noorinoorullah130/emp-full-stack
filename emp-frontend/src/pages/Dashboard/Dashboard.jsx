@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 
+import "./Dashboard.css";
 import {
     FaUsers,
     FaBuilding,
@@ -7,107 +8,86 @@ import {
     FaUserPlus,
     FaMoneyBill,
 } from "react-icons/fa";
-
 import { FaBuildingFlag } from "react-icons/fa6";
 
 import {
-    LineChart,
-    Line,
     XAxis,
     YAxis,
     CartesianGrid,
     Tooltip,
     Legend,
-    ResponsiveContainer,
-    PieChart,
-    Pie,
-    Cell,
     BarChart,
     Bar,
-    AreaChart,
-    Area,
+    ResponsiveContainer,
+    Cell,
+    LabelList,
+    PieChart,
+    Pie,
 } from "recharts";
 
-import "./Dashboard.css";
-import api from "../../utils/api";
 import { getTokenAndRole } from "../../utils/auth";
 import formatTotalSalary from "../../utils/formatTotalSalary";
 
 const Dashboard = () => {
-    const [dashboardDetails, setDashboardDetails] = useState({
-        totalDirectorates: 0,
-        totalEmployees: 0,
-        totalDepartments: 0,
-        newEmpsInTheLastFiveDays: 0,
-        totalSalary: 0,
-    });
-
     const { role } = getTokenAndRole();
 
-    const getDashboardDetails = async () => {
-        const response = await api.get("/dashboard");
-        const data = await response.data;
-        setDashboardDetails({
-            totalDirectorates: data.totalDirectorates,
-            totalEmployees: data.totalEmployees,
-            totalDepartments: data.totalDepartments,
-            newEmpsInTheLastFiveDays: data.newEmpsInTheLastFiveDays,
-            totalSalary: data.totalSalary,
-        });
-        // console.log(data);
+    const directorates = [
+        {
+            name: "Finance and Budget",
+            departments: 10,
+            employees: 10,
+            salary: 2000000,
+        },
+        {
+            name: "Human Resources",
+            departments: 5,
+            employees: 50,
+            salary: 750000,
+        },
+        {
+            name: "Logistics",
+            departments: 25,
+            employees: 100,
+            salary: 3000000,
+        },
+    ];
+
+    const genderData = [
+        { name: "Male", value: 120 },
+        { name: "Female", value: 80 },
+    ];
+
+    const COLORS = [
+        "#6366f1",
+        "#22c55e",
+        "#f59e0b",
+        "#ef4444",
+        "#0ea5e9",
+        "#8b5cf6",
+        "#ec4899",
+        "#14b8a6",
+        "#1e40af",
+        "#7c3aed",
+        "#16a34a",
+        "#f97316",
+        "#db2777",
+        "#0284c7",
+        "#15803d",
+        "#b45309",
+        "#dc2626",
+        "#4c1d95",
+        "#059669",
+        "#fbbf24",
+        "#2563eb",
+        "#34d399",
+    ];
+
+    const GENDER_COLORS = {
+        Male: "#3b82f6", // Blue
+        Female: "#ec4899", // Pink
     };
 
-    useEffect(() => {
-        getDashboardDetails();
-    }, []);
-
-    // Charts Data
-    const growthData = [
-        { day: "Day 1", employees: dashboardDetails.totalEmployees - 5 },
-        { day: "Day 2", employees: dashboardDetails.totalEmployees - 3 },
-        { day: "Day 3", employees: dashboardDetails.totalEmployees - 2 },
-        { day: "Day 4", employees: dashboardDetails.totalEmployees - 1 },
-        { day: "Day 5", employees: dashboardDetails.totalEmployees },
-    ];
-
-    const newHiresTrend = [
-        { day: "Day 1", hires: dashboardDetails.newEmpsInTheLastFiveDays - 4 },
-        { day: "Day 2", hires: dashboardDetails.newEmpsInTheLastFiveDays - 3 },
-        { day: "Day 3", hires: dashboardDetails.newEmpsInTheLastFiveDays - 2 },
-        { day: "Day 4", hires: dashboardDetails.newEmpsInTheLastFiveDays - 1 },
-        { day: "Day 5", hires: dashboardDetails.newEmpsInTheLastFiveDays },
-    ];
-
-    const salaryData = [
-        { category: "Low", value: dashboardDetails.totalSalary * 0.2 },
-        { category: "Medium", value: dashboardDetails.totalSalary * 0.5 },
-        { category: "High", value: dashboardDetails.totalSalary * 0.3 },
-    ];
-
-    const departmentData = [
-        { name: "Directorates", value: dashboardDetails.totalDirectorates },
-        { name: "Departments", value: dashboardDetails.totalDepartments },
-        { name: "New Hires", value: dashboardDetails.newEmpsInTheLastFiveDays },
-    ];
-
-    const dirDeptData = [
-        {
-            directorate: "Directorate 1",
-            departments: Math.floor(dashboardDetails.totalDepartments / 3),
-        },
-        {
-            directorate: "Directorate 2",
-            departments: Math.floor(dashboardDetails.totalDepartments / 3),
-        },
-        {
-            directorate: "Directorate 3",
-            departments:
-                dashboardDetails.totalDepartments -
-                2 * Math.floor(dashboardDetails.totalDepartments / 3),
-        },
-    ];
-
-    const COLORS = ["#4e73df", "#1cc88a", "#f6c23e"];
+    const renderLabel = ({ percent }) => `${(percent * 100).toFixed(0)}%`;
 
     return (
         <div className="dashboard">
@@ -134,43 +114,30 @@ const Dashboard = () => {
                         <div className="stat-card">
                             <div
                                 className="stat-icon"
-                                style={{ backgroundColor: "#dc17a1ff" }}
+                                style={{ backgroundColor: "#17dcd6" }}
                             >
-                                <FaUsers />
+                                <FaBuildingFlag />
                             </div>
                             <div className="stat-info">
-                                <h3>Total Users</h3>
-                                <p>{dashboardDetails.totalDirectorates}</p>
+                                <h3>All Directorates</h3>
+                                <p>5</p>
                             </div>
                         </div>
 
                         <div className="stat-card">
                             <div
                                 className="stat-icon"
-                                style={{ backgroundColor: "#17dcd6" }}
+                                style={{ backgroundColor: "#dc17a1ff" }}
                             >
-                                <FaBuildingFlag />
+                                <FaUsers />
                             </div>
                             <div className="stat-info">
-                                <h3>Total Directorates</h3>
-                                <p>{dashboardDetails.totalDirectorates}</p>
+                                <h3>All Users</h3>
+                                <p>10</p>
                             </div>
                         </div>
                     </>
                 )}
-
-                <div className="stat-card">
-                    <div
-                        className="stat-icon"
-                        style={{ backgroundColor: "#4e73df" }}
-                    >
-                        <FaUsers />
-                    </div>
-                    <div className="stat-info">
-                        <h3>Total Employees</h3>
-                        <p>{dashboardDetails.totalEmployees}</p>
-                    </div>
-                </div>
 
                 <div className="stat-card">
                     <div
@@ -180,8 +147,47 @@ const Dashboard = () => {
                         <FaBuilding />
                     </div>
                     <div className="stat-info">
-                        <h3>Total Departments</h3>
-                        <p>{dashboardDetails.totalDepartments}</p>
+                        <h3>All Departments</h3>
+                        <p>15</p>
+                    </div>
+                </div>
+
+                <div className="stat-card">
+                    <div
+                        className="stat-icon"
+                        style={{ backgroundColor: "#4e73df" }}
+                    >
+                        <FaUsers />
+                    </div>
+                    <div className="stat-info">
+                        <h3>All Employees</h3>
+                        <p>50</p>
+                    </div>
+                </div>
+
+                <div className="stat-card">
+                    <div
+                        className="stat-icon"
+                        style={{ backgroundColor: "#ff6347" }}
+                    >
+                        <FaMoneyBill />
+                    </div>
+                    <div className="stat-info">
+                        <h3>Total Salary</h3>
+                        <p>2000000</p>
+                    </div>
+                </div>
+
+                <div className="stat-card">
+                    <div
+                        className="stat-icon"
+                        style={{ backgroundColor: "#ff6347" }}
+                    >
+                        <FaMoneyBill />
+                    </div>
+                    <div className="stat-info">
+                        <h3>Average Salary</h3>
+                        <p>2000000</p>
                     </div>
                 </div>
 
@@ -194,183 +200,401 @@ const Dashboard = () => {
                     </div>
                     <div className="stat-info">
                         <h3>New Hires (Last 5 days)</h3>
-                        <p>{dashboardDetails.newEmpsInTheLastFiveDays}</p>
+                        <p>5</p>
                     </div>
                 </div>
 
                 <div className="stat-card">
                     <div
                         className="stat-icon"
-                        style={{ backgroundColor: "#ff6347" }}
+                        style={{ backgroundColor: "#f6c23e" }}
                     >
-                        <FaMoneyBill />
+                        <FaUserPlus />
                     </div>
                     <div className="stat-info">
-                        <h3>Total Employees Salary</h3>
-                        <p>{formatTotalSalary(dashboardDetails.totalSalary)}</p>
+                        <h3>New Hires (Last Moth)</h3>
+                        <p>25</p>
                     </div>
                 </div>
             </div>
 
             {/* Charts */}
             <div className="charts-container">
-                {/* Employee Growth Line Chart */}
+                {/* Departments by Directorate */}
                 <div className="main-chart">
-                    <h2>Employee Growth (Last 5 Days)</h2>
-                    <ResponsiveContainer width="100%" height={300}>
-                        <LineChart
-                            data={growthData}
-                            margin={{ top: 20, right: 30, left: 0, bottom: 0 }}
-                        >
-                            <defs>
-                                <linearGradient
-                                    id="colorEmployees"
-                                    x1="0"
-                                    y1="0"
-                                    x2="0"
-                                    y2="1"
-                                >
-                                    <stop
-                                        offset="5%"
-                                        stopColor="#4e73df"
-                                        stopOpacity={0.8}
-                                    />
-                                    <stop
-                                        offset="95%"
-                                        stopColor="#4e73df"
-                                        stopOpacity={0}
-                                    />
-                                </linearGradient>
-                            </defs>
-                            <CartesianGrid strokeDasharray="3 3" />
-                            <XAxis dataKey="day" />
-                            <YAxis />
-                            <Tooltip />
-                            <Legend />
-                            <Line
-                                type="monotone"
-                                dataKey="employees"
-                                stroke="#4e73df"
-                                strokeWidth={3}
-                                fill="url(#colorEmployees)"
-                                activeDot={{ r: 8 }}
-                                isAnimationActive
-                                animationDuration={1500}
-                            />
-                        </LineChart>
-                    </ResponsiveContainer>
-                </div>
-
-                {/* New Hires Area Chart */}
-                <div className="side-chart">
-                    <h2>New Hires Trend</h2>
-                    <ResponsiveContainer width="100%" height={300}>
-                        <AreaChart data={newHiresTrend}>
-                            <defs>
-                                <linearGradient
-                                    id="colorHires"
-                                    x1="0"
-                                    y1="0"
-                                    x2="0"
-                                    y2="1"
-                                >
-                                    <stop
-                                        offset="5%"
-                                        stopColor="#1cc88a"
-                                        stopOpacity={0.8}
-                                    />
-                                    <stop
-                                        offset="95%"
-                                        stopColor="#1cc88a"
-                                        stopOpacity={0}
-                                    />
-                                </linearGradient>
-                            </defs>
-                            <CartesianGrid strokeDasharray="3 3" />
-                            <XAxis dataKey="day" />
-                            <YAxis />
-                            <Tooltip />
-                            <Area
-                                type="monotone"
-                                dataKey="hires"
-                                stroke="#1cc88a"
-                                fill="url(#colorHires)"
-                                isAnimationActive
-                                animationDuration={1200}
-                            />
-                        </AreaChart>
-                    </ResponsiveContainer>
-                </div>
-
-                {/* Salary Distribution Bar Chart */}
-                <div className="main-chart">
-                    <h2>Salary Distribution</h2>
-                    <ResponsiveContainer width="100%" height={300}>
+                    <h2>Departments by Directorate</h2>
+                    <ResponsiveContainer width="100%" height={380}>
                         <BarChart
-                            data={salaryData}
-                            margin={{ top: 20, right: 30, left: 0, bottom: 0 }}
+                            data={directorates}
+                            barSize={40}
+                            margin={{
+                                top: 20,
+                                right: 30,
+                                left: 10,
+                                bottom: 60,
+                            }}
                         >
-                            <CartesianGrid strokeDasharray="3 3" />
-                            <XAxis dataKey="category" />
-                            <YAxis />
-                            <Tooltip />
-                            <Legend />
-                            <Bar
-                                dataKey="value"
-                                fill="#ff6347"
-                                isAnimationActive
-                                animationDuration={1200}
+                            <CartesianGrid
+                                strokeDasharray="3 3"
+                                stroke="#e0e0e0"
                             />
+
+                            <XAxis
+                                dataKey="name"
+                                angle={-25}
+                                textAnchor="end"
+                                tick={{ fontSize: 15 }}
+                            />
+
+                            <YAxis tick={{ fontSize: 15 }} />
+
+                            <Tooltip
+                                cursor={{ fill: "rgba(0,0,0,0.05)" }}
+                                contentStyle={{
+                                    borderRadius: "10px",
+                                    border: "none",
+                                    boxShadow: "0 4px 10px rgba(0,0,0,0.15)",
+                                }}
+                            />
+
+                            <Bar dataKey="departments" radius={[12, 12, 0, 0]}>
+                                {directorates.map((entry, index) => (
+                                    <Cell
+                                        key={index}
+                                        fill={COLORS[index % COLORS.length]}
+                                    />
+                                ))}
+
+                                {/* Value on top of bars */}
+                                <LabelList
+                                    dataKey="departments"
+                                    position="top"
+                                    style={{ fontSize: 15, fontWeight: "600" }}
+                                />
+                            </Bar>
                         </BarChart>
                     </ResponsiveContainer>
                 </div>
 
-                {/* Department Distribution Pie Chart */}
-                <div className="side-chart">
-                    <h2>Department Distribution</h2>
-                    <ResponsiveContainer width="100%" height={300}>
-                        <PieChart>
+                {/* Employees by Directorate */}
+                <div className="main-chart">
+                    <h2>Employees by Directorate</h2>
+                    <ResponsiveContainer width="100%" height={380}>
+                        <BarChart
+                            data={directorates}
+                            barSize={40}
+                            margin={{
+                                top: 20,
+                                right: 30,
+                                left: 10,
+                                bottom: 60,
+                            }}
+                        >
+                            <CartesianGrid
+                                strokeDasharray="3 3"
+                                stroke="#e0e0e0"
+                            />
+
+                            <XAxis
+                                dataKey="name"
+                                angle={-25}
+                                textAnchor="end"
+                                tick={{ fontSize: 15 }}
+                            />
+
+                            <YAxis tick={{ fontSize: 15 }} />
+
+                            <Tooltip
+                                cursor={{ fill: "rgba(0,0,0,0.05)" }}
+                                contentStyle={{
+                                    borderRadius: "10px",
+                                    border: "none",
+                                    boxShadow: "0 4px 10px rgba(0,0,0,0.15)",
+                                }}
+                            />
+
+                            <Bar dataKey="employees" radius={[12, 12, 0, 0]}>
+                                {directorates.map((entry, index) => (
+                                    <Cell
+                                        key={index}
+                                        fill={COLORS[index % COLORS.length]}
+                                    />
+                                ))}
+
+                                {/* Value on top of bars */}
+                                <LabelList
+                                    dataKey="employees"
+                                    position="top"
+                                    style={{ fontSize: 15, fontWeight: "600" }}
+                                />
+                            </Bar>
+                        </BarChart>
+                    </ResponsiveContainer>
+                </div>
+
+                {/* Employees by Department */}
+                <div className="main-chart">
+                    <h2>Employees by Department</h2>
+                    <ResponsiveContainer width="100%" height={380}>
+                        <BarChart
+                            data={directorates}
+                            barSize={40}
+                            margin={{
+                                top: 20,
+                                right: 30,
+                                left: 10,
+                                bottom: 60,
+                            }}
+                        >
+                            <CartesianGrid
+                                strokeDasharray="3 3"
+                                stroke="#e0e0e0"
+                            />
+
+                            <XAxis
+                                dataKey="name"
+                                angle={-25}
+                                textAnchor="end"
+                                tick={{ fontSize: 15 }}
+                            />
+
+                            <YAxis tick={{ fontSize: 15 }} />
+
+                            <Tooltip
+                                cursor={{ fill: "rgba(0,0,0,0.05)" }}
+                                contentStyle={{
+                                    borderRadius: "10px",
+                                    border: "none",
+                                    boxShadow: "0 4px 10px rgba(0,0,0,0.15)",
+                                }}
+                            />
+
+                            <Bar dataKey="employees" radius={[12, 12, 0, 0]}>
+                                {directorates.map((entry, index) => (
+                                    <Cell
+                                        key={index}
+                                        fill={COLORS[index % COLORS.length]}
+                                    />
+                                ))}
+
+                                {/* Value on top of bars */}
+                                <LabelList
+                                    dataKey="employees"
+                                    position="top"
+                                    style={{ fontSize: 15, fontWeight: "600" }}
+                                />
+                            </Bar>
+                        </BarChart>
+                    </ResponsiveContainer>
+                </div>
+
+                {/* Salary by Directorate */}
+                <div className="main-chart">
+                    <h2>Salary by Directorate</h2>
+                    <ResponsiveContainer width="100%" height={380}>
+                        <BarChart
+                            data={directorates}
+                            barSize={40}
+                            margin={{
+                                top: 20,
+                                right: 30,
+                                left: 10,
+                                bottom: 60,
+                            }}
+                        >
+                            <CartesianGrid
+                                strokeDasharray="3 3"
+                                stroke="#e0e0e0"
+                            />
+
+                            <XAxis
+                                dataKey="name"
+                                angle={-25}
+                                textAnchor="end"
+                                tick={{ fontSize: 15 }}
+                            />
+
+                            <YAxis
+                                tick={{ fontSize: 15 }}
+                                tickFormatter={formatTotalSalary}
+                            />
+
+                            <Tooltip
+                                cursor={{ fill: "rgba(0,0,0,0.05)" }}
+                                contentStyle={{
+                                    borderRadius: "10px",
+                                    border: "none",
+                                    boxShadow: "0 4px 10px rgba(0,0,0,0.15)",
+                                }}
+                                formatter={(salary) =>
+                                    formatTotalSalary(salary)
+                                }
+                            />
+
+                            <Bar dataKey="salary" radius={[12, 12, 0, 0]}>
+                                {directorates.map((entry, index) => (
+                                    <Cell
+                                        fill={COLORS[index % COLORS.length]}
+                                    />
+                                ))}
+
+                                {/* Value on top of bars */}
+                                <LabelList
+                                    dataKey="salary"
+                                    position="top"
+                                    style={{ fontSize: 15, fontWeight: "600" }}
+                                    formatter={formatTotalSalary}
+                                />
+                            </Bar>
+                        </BarChart>
+                    </ResponsiveContainer>
+                </div>
+
+                {/* Salary by Departments */}
+                <div className="main-chart">
+                    <h2>Salary by Departments</h2>
+                    <ResponsiveContainer width="100%" height={380}>
+                        <BarChart
+                            data={directorates}
+                            barSize={40}
+                            margin={{
+                                top: 20,
+                                right: 30,
+                                left: 10,
+                                bottom: 60,
+                            }}
+                        >
+                            <CartesianGrid
+                                strokeDasharray="3 3"
+                                stroke="#e0e0e0"
+                            />
+
+                            <XAxis
+                                dataKey="name"
+                                angle={-25}
+                                textAnchor="end"
+                                tick={{ fontSize: 15 }}
+                            />
+
+                            <YAxis
+                                tick={{ fontSize: 15 }}
+                                tickFormatter={formatTotalSalary}
+                            />
+
+                            <Tooltip
+                                cursor={{ fill: "rgba(0,0,0,0.05)" }}
+                                contentStyle={{
+                                    borderRadius: "10px",
+                                    border: "none",
+                                    boxShadow: "0 4px 10px rgba(0,0,0,0.15)",
+                                }}
+                                formatter={(salary) =>
+                                    formatTotalSalary(salary)
+                                }
+                            />
+
+                            <Bar dataKey="salary" radius={[12, 12, 0, 0]}>
+                                {directorates.map((entry, index) => (
+                                    <Cell
+                                        fill={COLORS[index % COLORS.length]}
+                                    />
+                                ))}
+
+                                {/* Value on top of bars */}
+                                <LabelList
+                                    dataKey="salary"
+                                    position="top"
+                                    style={{ fontSize: 15, fontWeight: "600" }}
+                                    formatter={formatTotalSalary}
+                                />
+                            </Bar>
+                        </BarChart>
+                    </ResponsiveContainer>
+                </div>
+
+                {/* Grades Count */}
+                <div className="main-chart">
+                    <h2>Grades Count</h2>
+                    <ResponsiveContainer width="100%" height={380}>
+                        <BarChart
+                            data={directorates}
+                            barSize={40}
+                            margin={{
+                                top: 20,
+                                right: 30,
+                                left: 10,
+                                bottom: 60,
+                            }}
+                        >
+                            <CartesianGrid
+                                strokeDasharray="3 3"
+                                stroke="#e0e0e0"
+                            />
+
+                            <XAxis
+                                dataKey="name"
+                                angle={-25}
+                                textAnchor="end"
+                                tick={{ fontSize: 15 }}
+                            />
+
+                            <YAxis tick={{ fontSize: 15 }} />
+
+                            <Tooltip
+                                cursor={{ fill: "rgba(0,0,0,0.05)" }}
+                                contentStyle={{
+                                    borderRadius: "10px",
+                                    border: "none",
+                                    boxShadow: "0 4px 10px rgba(0,0,0,0.15)",
+                                }}
+                            />
+
+                            <Bar dataKey="salary" radius={[12, 12, 0, 0]}>
+                                {directorates.map((entry, index) => (
+                                    <Cell
+                                        fill={COLORS[index % COLORS.length]}
+                                    />
+                                ))}
+
+                                {/* Value on top of bars */}
+                                <LabelList
+                                    dataKey="salary"
+                                    position="top"
+                                    style={{ fontSize: 15, fontWeight: "600" }}
+                                />
+                            </Bar>
+                        </BarChart>
+                    </ResponsiveContainer>
+                </div>
+
+                {/* Employees by Directorate */}
+                <div className="main-chart">
+                    <h2>Employees Gender</h2>
+                    <ResponsiveContainer width="100%" height={380}>
+                        <PieChart width={350} height={300}>
                             <Pie
-                                data={departmentData}
+                                data={genderData}
                                 dataKey="value"
                                 nameKey="name"
                                 cx="50%"
                                 cy="50%"
-                                outerRadius={90}
-                                innerRadius={40}
-                                label
-                                isAnimationActive
-                                animationDuration={1200}
+                                outerRadius={110}
+                                innerRadius={60}
+                                paddingAngle={3}
+                                label={renderLabel}
+                                labelLine={false}
                             >
-                                {departmentData.map((entry, index) => (
+                                {genderData.map((entry, index) => (
                                     <Cell
                                         key={`cell-${index}`}
-                                        fill={COLORS[index % COLORS.length]}
+                                        fill={GENDER_COLORS[entry.name]}
                                     />
                                 ))}
                             </Pie>
+
                             <Tooltip />
                             <Legend verticalAlign="bottom" height={36} />
                         </PieChart>
-                    </ResponsiveContainer>
-                </div>
-
-                {/* Directorates vs Departments Stacked Bar Chart */}
-                <div className="main-chart">
-                    <h2>Directorates vs Departments</h2>
-                    <ResponsiveContainer width="100%" height={300}>
-                        <BarChart data={dirDeptData}>
-                            <CartesianGrid strokeDasharray="3 3" />
-                            <XAxis dataKey="directorate" />
-                            <YAxis />
-                            <Tooltip />
-                            <Legend />
-                            <Bar
-                                dataKey="departments"
-                                stackId="a"
-                                fill="#1cc88a"
-                            />
-                        </BarChart>
                     </ResponsiveContainer>
                 </div>
             </div>

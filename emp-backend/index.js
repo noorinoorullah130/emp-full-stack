@@ -10,7 +10,6 @@ const empRoutes = require("./routes/employee");
 const settingRoutes = require("./routes/setting");
 const dashboardRoutes = require("./routes/dashboard");
 const directorateRoutes = require("./routes/directorate");
-const aggregateMethod = require("./training/aggregateMethod");
 
 const app = express();
 
@@ -29,8 +28,6 @@ app.use("/api/directorate", directorateRoutes);
 app.use("/api/department", dptRoutes);
 app.use("/api/employee", empRoutes);
 app.use("/api/setting", settingRoutes);
-
-app.use("/api/aggregate", aggregateMethod);
 
 const PORT = process.env.PORT || 5000;
 

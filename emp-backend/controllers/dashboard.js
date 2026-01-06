@@ -1,66 +1,65 @@
 const Directorate = require("../models/directorate");
+const User = require("../models/user");
 const Department = require("../models/department");
 const Employee = require("../models/employee");
 
+const today = new Date();
+const fiveDaysAgo = new Date();
+fiveDaysAgo.setDate(today.getDate() - 5);
+const lastMonthAgo = new Date();
+lastMonthAgo.setDate(today.getDate() - 30);
+
 const getDashboardInformation = async (req, res) => {
-    const now = new Date();
-    const fiveDaysAgo = new Date();
-    fiveDaysAgo.setDate(now.getDate() - 5);
-
     try {
-        if (req.user.role.includes("admin")) {
-            // For Admin
-            const totalDirectorates = await Directorate.find();
-            const totalDepartments = await Department.countDocuments();
-            const totalEmployees = await Employee.find();
+        const allDirectorates = await Directorate.countDocuments();
+        const allUsers = await User.countDocuments();
+        const allDepartments = await Department.countDocuments();
+        const allEmployees = await Employee.find();
 
-            const newEmpsInTheLastFiveDays = await Employee.find({
-                createdAt: { $gte: fiveDaysAgo, $lte: now },
-            }).countDocuments();
+        const totalSalary = allEmployees.reduce(
+            (currentValue, emp) => currentValue + emp.salary,
+            0
+        );
 
-            let totalSalary = 0;
+        const averageSalary = (totalSalary / allEmployees.length).toFixed(2);
 
-            totalEmployees.forEach((emp) => {
-                totalSalary = totalSalary + emp.salary;
-            });
+        const newEmployeesInLastFiveDays = allEmployees.filter(
+            (emp) => new Date(emp.hireDate) >= new Date(fiveDaysAgo)
+        );
 
-            res.status(200).json({
-                totalDirectorates: totalDirectorates.length,
-                totalDepartments,
-                totalEmployees: totalEmployees.length,
-                newEmpsInTheLastFiveDays,
-                totalSalary,
-            });
-        } else if (req.user.role.includes("user")) {
-            // For User
-            const totalDepartments = await Department.countDocuments({
-                directorate: req.user.directorate,
-            });
-            const totalEmployees = await Employee.find({
-                directorate: req.user.directorate,
-            });
+        const newEmployeesInLastMonth = allEmployees.filter(
+            (emp) => new Date(emp.hireDate) >= new Date(lastMonthAgo)
+        );
 
-            const newEmpsInTheLastFiveDays = await Employee.find({
-                createdAt: {
-                    $gte: fiveDaysAgo,
-                    $lte: now,
+        const fullDetails = await Directorate.aggregate([
+            {
+                $lookup: {
+                    from: "departments",
+                    localField: "_id",
+                    foreignField: "directorate",
+                    as: "departmentCount",
                 },
-                directorate: req.user.directorate,
-            }).countDocuments();
+            },
+            {
+                $lookup: {
+                    from: "employees",
+                    localField: "_id",
+                    foreignField: "directorate",
+                    as: "employees",
+                },
+            },
+        ]);
 
-            let totalSalary = 0;
-
-            totalEmployees.forEach((emp) => {
-                totalSalary = totalSalary + emp.salary;
-            });
-
-            res.status(200).json({
-                totalEmployees: totalEmployees.length,
-                totalDepartments,
-                newEmpsInTheLastFiveDays,
-                totalSalary,
-            });
-        }
+        res.status(200).json({
+            allDirectorates,
+            allUsers,
+            allDepartments,
+            allEmployees: allEmployees.length,
+            totalSalary,
+            averageSalary,
+            newEmployeesInLastMonth: newEmployeesInLastMonth.length,
+            newEmployeesInLastFiveDays: newEmployeesInLastFiveDays.length,
+        });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
