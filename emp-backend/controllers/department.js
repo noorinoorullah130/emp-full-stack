@@ -1,6 +1,7 @@
 const Department = require("../models/department");
 const Directorate = require("../models/directorate");
 const Employee = require("../models/employee");
+const mongoose = require("mongoose");
 
 const addNewDpt = async (req, res) => {
     try {
@@ -94,7 +95,9 @@ const getAllDpts = async (req, res) => {
             : await Department.aggregate([
                   {
                       $match: {
-                          directorate: ObjectId("6958a22b9a2efa032d234600"),
+                          directorate: new mongoose.Types.ObjectId(
+                              req.user.directorate
+                          ),
                       },
                   },
                   {
@@ -130,38 +133,6 @@ const getAllDpts = async (req, res) => {
                   .sort({ _id: -1 })
                   .limit(limit)
                   .skip(skip);
-
-        // const allDirectorates = req.user.role.includes("admin")
-        //     ? await Directorate.find().select("dirName")
-        //     : await Directorate.find({ _id: req.user.directorate }).select(
-        //           "dirName"
-        //       );
-
-        // const allEmployees = req.user.role.includes("admin")
-        //     ? await Employee.find()
-        //     : await Employee.find({ directorate: req.user.directorate });
-
-        // const allDepartmentsWithDetails = allDpts.map((dpt) => {
-        //     const dptDirectorate = allDirectorates.find((dir) =>
-        //         dir._id.equals(dpt.directorate)
-        //     );
-
-        //     const empsInOneDpt = allEmployees.filter((emp) =>
-        //         emp.department.equals(dpt._id)
-        //     );
-
-        //     const totalSalaryOfDpt = empsInOneDpt.reduce(
-        //         (currentValue, emp) => currentValue + emp.salary,
-        //         0
-        //     );
-
-        //     return {
-        //         ...dpt.toObject(),
-        //         dptDirectorate: dptDirectorate.dirName,
-        //         empsInOneDpt: empsInOneDpt.length,
-        //         totalSalaryOfDpt,
-        //     };
-        // });
 
         const totalDpts = req.user.role.includes("admin")
             ? await Department.countDocuments()

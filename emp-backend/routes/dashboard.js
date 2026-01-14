@@ -4,6 +4,6 @@ const router = express.Router();
 const getDashboardInformation = require("../controllers/dashboard");
 const verifyToken = require("../middleware/verifyToken");
 
-router.get("/", getDashboardInformation);
+router.get("/", verifyToken, getDashboardInformation);
 
 module.exports = router;

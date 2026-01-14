@@ -27,30 +27,46 @@ import {
 
 import { getTokenAndRole } from "../../utils/auth";
 import formatTotalSalary from "../../utils/formatTotalSalary";
+import { toast } from "react-toastify";
+import api from "../../utils/api";
 
 const Dashboard = () => {
     const { role } = getTokenAndRole();
 
-    const directorates = [
-        {
-            name: "Finance and Budget",
-            departments: 10,
-            employees: 10,
-            salary: 2000000,
-        },
-        {
-            name: "Human Resources",
-            departments: 5,
-            employees: 50,
-            salary: 750000,
-        },
-        {
-            name: "Logistics",
-            departments: 25,
-            employees: 100,
-            salary: 3000000,
-        },
-    ];
+    const [fullDashboard, setFullDashboard] = useState({
+        allDirectorates: 0,
+        allUsers: 0,
+        allDepartments: 0,
+        allEmployees: 0,
+        totalSalary: 0,
+        averageSalary: 0,
+        newEmployeesInLastFiveDays: 0,
+        newEmployeesInLastMonth: 0,
+        directorateDetailsOfDashboard: [],
+        departmentDetailsOfDashboard: [],
+        gradesCount: [],
+    });
+    const [loading, setLoading] = useState(false);
+
+    const fetchDashboardDetails = async () => {
+        setLoading(true);
+
+        try {
+            const response = await api.get("/dashboard");
+            const data = response.data;
+            setFullDashboard(data);
+            console.log(data);
+        } catch (error) {
+            toast.error(error.response?.data?.message);
+            console.log(error.response);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        fetchDashboardDetails();
+    }, []);
 
     const genderData = [
         { name: "Male", value: 120 },
@@ -120,7 +136,7 @@ const Dashboard = () => {
                             </div>
                             <div className="stat-info">
                                 <h3>All Directorates</h3>
-                                <p>5</p>
+                                <p>{fullDashboard.allDirectorates}</p>
                             </div>
                         </div>
 
@@ -133,7 +149,7 @@ const Dashboard = () => {
                             </div>
                             <div className="stat-info">
                                 <h3>All Users</h3>
-                                <p>10</p>
+                                <p>{fullDashboard.allUsers}</p>
                             </div>
                         </div>
                     </>
@@ -148,7 +164,7 @@ const Dashboard = () => {
                     </div>
                     <div className="stat-info">
                         <h3>All Departments</h3>
-                        <p>15</p>
+                        <p>{fullDashboard.allDepartments}</p>
                     </div>
                 </div>
 
@@ -161,7 +177,7 @@ const Dashboard = () => {
                     </div>
                     <div className="stat-info">
                         <h3>All Employees</h3>
-                        <p>50</p>
+                        <p>{fullDashboard.allEmployees}</p>
                     </div>
                 </div>
 
@@ -174,7 +190,7 @@ const Dashboard = () => {
                     </div>
                     <div className="stat-info">
                         <h3>Total Salary</h3>
-                        <p>2000000</p>
+                        <p>{formatTotalSalary(fullDashboard.totalSalary)}</p>
                     </div>
                 </div>
 
@@ -187,7 +203,10 @@ const Dashboard = () => {
                     </div>
                     <div className="stat-info">
                         <h3>Average Salary</h3>
-                        <p>2000000</p>
+                        <p>
+                            {formatTotalSalary(fullDashboard.averageSalary) ||
+                                0}
+                        </p>
                     </div>
                 </div>
 
@@ -200,7 +219,7 @@ const Dashboard = () => {
                     </div>
                     <div className="stat-info">
                         <h3>New Hires (Last 5 days)</h3>
-                        <p>5</p>
+                        <p>{fullDashboard.newEmployeesInLastFiveDays}</p>
                     </div>
                 </div>
 
@@ -212,132 +231,168 @@ const Dashboard = () => {
                         <FaUserPlus />
                     </div>
                     <div className="stat-info">
-                        <h3>New Hires (Last Moth)</h3>
-                        <p>25</p>
+                        <h3>New Hires (Last Month)</h3>
+                        <p>{fullDashboard.newEmployeesInLastMonth}</p>
                     </div>
                 </div>
             </div>
 
             {/* Charts */}
             <div className="charts-container">
-                {/* Departments by Directorate */}
-                <div className="main-chart">
-                    <h2>Departments by Directorate</h2>
-                    <ResponsiveContainer width="100%" height={380}>
-                        <BarChart
-                            data={directorates}
-                            barSize={40}
-                            margin={{
-                                top: 20,
-                                right: 30,
-                                left: 10,
-                                bottom: 60,
-                            }}
-                        >
-                            <CartesianGrid
-                                strokeDasharray="3 3"
-                                stroke="#e0e0e0"
-                            />
-
-                            <XAxis
-                                dataKey="name"
-                                angle={-25}
-                                textAnchor="end"
-                                tick={{ fontSize: 15 }}
-                            />
-
-                            <YAxis tick={{ fontSize: 15 }} />
-
-                            <Tooltip
-                                cursor={{ fill: "rgba(0,0,0,0.05)" }}
-                                contentStyle={{
-                                    borderRadius: "10px",
-                                    border: "none",
-                                    boxShadow: "0 4px 10px rgba(0,0,0,0.15)",
-                                }}
-                            />
-
-                            <Bar dataKey="departments" radius={[12, 12, 0, 0]}>
-                                {directorates.map((entry, index) => (
-                                    <Cell
-                                        key={index}
-                                        fill={COLORS[index % COLORS.length]}
+                {role === "admin" && (
+                    <>
+                        {/* Departments by Directorate */}
+                        <div className="main-chart">
+                            <h2>Departments by Directorate</h2>
+                            <ResponsiveContainer width="100%" height={380}>
+                                <BarChart
+                                    data={
+                                        fullDashboard.directorateDetailsOfDashboard
+                                    }
+                                    barSize={40}
+                                    margin={{
+                                        top: 20,
+                                        right: 30,
+                                        left: 10,
+                                        bottom: 60,
+                                    }}
+                                >
+                                    <CartesianGrid
+                                        strokeDasharray="3 3"
+                                        stroke="#e0e0e0"
                                     />
-                                ))}
 
-                                {/* Value on top of bars */}
-                                <LabelList
-                                    dataKey="departments"
-                                    position="top"
-                                    style={{ fontSize: 15, fontWeight: "600" }}
-                                />
-                            </Bar>
-                        </BarChart>
-                    </ResponsiveContainer>
-                </div>
-
-                {/* Employees by Directorate */}
-                <div className="main-chart">
-                    <h2>Employees by Directorate</h2>
-                    <ResponsiveContainer width="100%" height={380}>
-                        <BarChart
-                            data={directorates}
-                            barSize={40}
-                            margin={{
-                                top: 20,
-                                right: 30,
-                                left: 10,
-                                bottom: 60,
-                            }}
-                        >
-                            <CartesianGrid
-                                strokeDasharray="3 3"
-                                stroke="#e0e0e0"
-                            />
-
-                            <XAxis
-                                dataKey="name"
-                                angle={-25}
-                                textAnchor="end"
-                                tick={{ fontSize: 15 }}
-                            />
-
-                            <YAxis tick={{ fontSize: 15 }} />
-
-                            <Tooltip
-                                cursor={{ fill: "rgba(0,0,0,0.05)" }}
-                                contentStyle={{
-                                    borderRadius: "10px",
-                                    border: "none",
-                                    boxShadow: "0 4px 10px rgba(0,0,0,0.15)",
-                                }}
-                            />
-
-                            <Bar dataKey="employees" radius={[12, 12, 0, 0]}>
-                                {directorates.map((entry, index) => (
-                                    <Cell
-                                        key={index}
-                                        fill={COLORS[index % COLORS.length]}
+                                    <XAxis
+                                        dataKey="dirName"
+                                        angle={-25}
+                                        textAnchor="end"
+                                        tick={{ fontSize: 15 }}
                                     />
-                                ))}
 
-                                {/* Value on top of bars */}
-                                <LabelList
-                                    dataKey="employees"
-                                    position="top"
-                                    style={{ fontSize: 15, fontWeight: "600" }}
-                                />
-                            </Bar>
-                        </BarChart>
-                    </ResponsiveContainer>
-                </div>
+                                    <YAxis tick={{ fontSize: 15 }} />
+
+                                    <Tooltip
+                                        cursor={{ fill: "rgba(0,0,0,0.05)" }}
+                                        contentStyle={{
+                                            borderRadius: "10px",
+                                            border: "none",
+                                            boxShadow:
+                                                "0 4px 10px rgba(0,0,0,0.15)",
+                                        }}
+                                    />
+
+                                    <Bar
+                                        dataKey="dptsPerDir"
+                                        radius={[12, 12, 0, 0]}
+                                    >
+                                        {fullDashboard.directorateDetailsOfDashboard?.map(
+                                            (entry, index) => (
+                                                <Cell
+                                                    key={index}
+                                                    fill={
+                                                        COLORS[
+                                                            index %
+                                                                COLORS.length
+                                                        ]
+                                                    }
+                                                />
+                                            )
+                                        )}
+
+                                        {/* Value on top of bars */}
+                                        <LabelList
+                                            dataKey="dptsPerDir"
+                                            position="top"
+                                            style={{
+                                                fontSize: 15,
+                                                fontWeight: "600",
+                                            }}
+                                        />
+                                    </Bar>
+                                </BarChart>
+                            </ResponsiveContainer>
+                        </div>
+
+                        {/* Employees by Directorate */}
+                        <div className="main-chart">
+                            <h2>Employees by Directorate</h2>
+                            <ResponsiveContainer width="100%" height={380}>
+                                <BarChart
+                                    data={
+                                        fullDashboard.directorateDetailsOfDashboard
+                                    }
+                                    barSize={40}
+                                    margin={{
+                                        top: 20,
+                                        right: 30,
+                                        left: 10,
+                                        bottom: 60,
+                                    }}
+                                >
+                                    <CartesianGrid
+                                        strokeDasharray="3 3"
+                                        stroke="#e0e0e0"
+                                    />
+
+                                    <XAxis
+                                        dataKey="dirName"
+                                        angle={-25}
+                                        textAnchor="end"
+                                        tick={{ fontSize: 15 }}
+                                    />
+
+                                    <YAxis tick={{ fontSize: 15 }} />
+
+                                    <Tooltip
+                                        cursor={{ fill: "rgba(0,0,0,0.05)" }}
+                                        contentStyle={{
+                                            borderRadius: "10px",
+                                            border: "none",
+                                            boxShadow:
+                                                "0 4px 10px rgba(0,0,0,0.15)",
+                                        }}
+                                    />
+
+                                    <Bar
+                                        dataKey="empsPerDir"
+                                        radius={[12, 12, 0, 0]}
+                                    >
+                                        {fullDashboard.directorateDetailsOfDashboard?.map(
+                                            (entry, index) => (
+                                                <Cell
+                                                    key={index}
+                                                    fill={
+                                                        COLORS[
+                                                            index %
+                                                                COLORS.length
+                                                        ]
+                                                    }
+                                                />
+                                            )
+                                        )}
+
+                                        {/* Value on top of bars */}
+                                        <LabelList
+                                            dataKey="empsPerDir"
+                                            position="top"
+                                            style={{
+                                                fontSize: 15,
+                                                fontWeight: "600",
+                                            }}
+                                        />
+                                    </Bar>
+                                </BarChart>
+                            </ResponsiveContainer>
+                        </div>
+                    </>
+                )}
 
                 {/* Employees by Department */}
                 <div className="main-chart">
                     <h2>Employees by Department</h2>
                     <ResponsiveContainer width="100%" height={380}>
                         <BarChart
-                            data={directorates}
+                            data={fullDashboard.departmentDetailsOfDashboard}
                             barSize={40}
                             margin={{
                                 top: 20,
@@ -352,7 +407,7 @@ const Dashboard = () => {
                             />
 
                             <XAxis
-                                dataKey="name"
+                                dataKey="dptName"
                                 angle={-25}
                                 textAnchor="end"
                                 tick={{ fontSize: 15 }}
@@ -369,17 +424,19 @@ const Dashboard = () => {
                                 }}
                             />
 
-                            <Bar dataKey="employees" radius={[12, 12, 0, 0]}>
-                                {directorates.map((entry, index) => (
-                                    <Cell
-                                        key={index}
-                                        fill={COLORS[index % COLORS.length]}
-                                    />
-                                ))}
+                            <Bar dataKey="empsPerDpt" radius={[12, 12, 0, 0]}>
+                                {fullDashboard.departmentDetailsOfDashboard.map(
+                                    (entry, index) => (
+                                        <Cell
+                                            key={index}
+                                            fill={COLORS[index % COLORS.length]}
+                                        />
+                                    )
+                                )}
 
                                 {/* Value on top of bars */}
                                 <LabelList
-                                    dataKey="employees"
+                                    dataKey="empsPerDpt"
                                     position="top"
                                     style={{ fontSize: 15, fontWeight: "600" }}
                                 />
@@ -388,74 +445,94 @@ const Dashboard = () => {
                     </ResponsiveContainer>
                 </div>
 
-                {/* Salary by Directorate */}
-                <div className="main-chart">
-                    <h2>Salary by Directorate</h2>
-                    <ResponsiveContainer width="100%" height={380}>
-                        <BarChart
-                            data={directorates}
-                            barSize={40}
-                            margin={{
-                                top: 20,
-                                right: 30,
-                                left: 10,
-                                bottom: 60,
-                            }}
-                        >
-                            <CartesianGrid
-                                strokeDasharray="3 3"
-                                stroke="#e0e0e0"
-                            />
-
-                            <XAxis
-                                dataKey="name"
-                                angle={-25}
-                                textAnchor="end"
-                                tick={{ fontSize: 15 }}
-                            />
-
-                            <YAxis
-                                tick={{ fontSize: 15 }}
-                                tickFormatter={formatTotalSalary}
-                            />
-
-                            <Tooltip
-                                cursor={{ fill: "rgba(0,0,0,0.05)" }}
-                                contentStyle={{
-                                    borderRadius: "10px",
-                                    border: "none",
-                                    boxShadow: "0 4px 10px rgba(0,0,0,0.15)",
-                                }}
-                                formatter={(salary) =>
-                                    formatTotalSalary(salary)
-                                }
-                            />
-
-                            <Bar dataKey="salary" radius={[12, 12, 0, 0]}>
-                                {directorates.map((entry, index) => (
-                                    <Cell
-                                        fill={COLORS[index % COLORS.length]}
+                {role === "admin" && (
+                    <>
+                        {/* Salary by Directorate */}
+                        <div className="main-chart">
+                            <h2>Salary by Directorate</h2>
+                            <ResponsiveContainer width="100%" height={380}>
+                                <BarChart
+                                    data={
+                                        fullDashboard.directorateDetailsOfDashboard
+                                    }
+                                    barSize={40}
+                                    margin={{
+                                        top: 20,
+                                        right: 30,
+                                        left: 10,
+                                        bottom: 60,
+                                    }}
+                                >
+                                    <CartesianGrid
+                                        strokeDasharray="3 3"
+                                        stroke="#e0e0e0"
                                     />
-                                ))}
 
-                                {/* Value on top of bars */}
-                                <LabelList
-                                    dataKey="salary"
-                                    position="top"
-                                    style={{ fontSize: 15, fontWeight: "600" }}
-                                    formatter={formatTotalSalary}
-                                />
-                            </Bar>
-                        </BarChart>
-                    </ResponsiveContainer>
-                </div>
+                                    <XAxis
+                                        dataKey="dirName"
+                                        angle={-25}
+                                        textAnchor="end"
+                                        tick={{ fontSize: 15 }}
+                                    />
+
+                                    <YAxis
+                                        tick={{ fontSize: 15 }}
+                                        tickFormatter={formatTotalSalary}
+                                    />
+
+                                    <Tooltip
+                                        cursor={{ fill: "rgba(0,0,0,0.05)" }}
+                                        contentStyle={{
+                                            borderRadius: "10px",
+                                            border: "none",
+                                            boxShadow:
+                                                "0 4px 10px rgba(0,0,0,0.15)",
+                                        }}
+                                        formatter={(salary) =>
+                                            formatTotalSalary(salary)
+                                        }
+                                    />
+
+                                    <Bar
+                                        dataKey="salaryPerDir"
+                                        radius={[12, 12, 0, 0]}
+                                    >
+                                        {fullDashboard.directorateDetailsOfDashboard?.map(
+                                            (entry, index) => (
+                                                <Cell
+                                                    fill={
+                                                        COLORS[
+                                                            index %
+                                                                COLORS.length
+                                                        ]
+                                                    }
+                                                />
+                                            )
+                                        )}
+
+                                        {/* Value on top of bars */}
+                                        <LabelList
+                                            dataKey="salaryPerDir"
+                                            position="top"
+                                            style={{
+                                                fontSize: 15,
+                                                fontWeight: "600",
+                                            }}
+                                            formatter={formatTotalSalary}
+                                        />
+                                    </Bar>
+                                </BarChart>
+                            </ResponsiveContainer>
+                        </div>
+                    </>
+                )}
 
                 {/* Salary by Departments */}
                 <div className="main-chart">
                     <h2>Salary by Departments</h2>
                     <ResponsiveContainer width="100%" height={380}>
                         <BarChart
-                            data={directorates}
+                            data={fullDashboard.departmentDetailsOfDashboard}
                             barSize={40}
                             margin={{
                                 top: 20,
@@ -470,7 +547,7 @@ const Dashboard = () => {
                             />
 
                             <XAxis
-                                dataKey="name"
+                                dataKey="dptName"
                                 angle={-25}
                                 textAnchor="end"
                                 tick={{ fontSize: 15 }}
@@ -493,16 +570,18 @@ const Dashboard = () => {
                                 }
                             />
 
-                            <Bar dataKey="salary" radius={[12, 12, 0, 0]}>
-                                {directorates.map((entry, index) => (
-                                    <Cell
-                                        fill={COLORS[index % COLORS.length]}
-                                    />
-                                ))}
+                            <Bar dataKey="salaryPerDpt" radius={[12, 12, 0, 0]}>
+                                {fullDashboard.departmentDetailsOfDashboard.map(
+                                    (entry, index) => (
+                                        <Cell
+                                            fill={COLORS[index % COLORS.length]}
+                                        />
+                                    )
+                                )}
 
                                 {/* Value on top of bars */}
                                 <LabelList
-                                    dataKey="salary"
+                                    dataKey="salaryPerDpt"
                                     position="top"
                                     style={{ fontSize: 15, fontWeight: "600" }}
                                     formatter={formatTotalSalary}
@@ -517,7 +596,7 @@ const Dashboard = () => {
                     <h2>Grades Count</h2>
                     <ResponsiveContainer width="100%" height={380}>
                         <BarChart
-                            data={directorates}
+                            data={fullDashboard.gradesCount}
                             barSize={40}
                             margin={{
                                 top: 20,
@@ -532,7 +611,7 @@ const Dashboard = () => {
                             />
 
                             <XAxis
-                                dataKey="name"
+                                dataKey="grade"
                                 angle={-25}
                                 textAnchor="end"
                                 tick={{ fontSize: 15 }}
@@ -549,16 +628,18 @@ const Dashboard = () => {
                                 }}
                             />
 
-                            <Bar dataKey="salary" radius={[12, 12, 0, 0]}>
-                                {directorates.map((entry, index) => (
-                                    <Cell
-                                        fill={COLORS[index % COLORS.length]}
-                                    />
-                                ))}
+                            <Bar dataKey="count" radius={[12, 12, 0, 0]}>
+                                {fullDashboard.gradesCount.map(
+                                    (entry, index) => (
+                                        <Cell
+                                            fill={COLORS[index % COLORS.length]}
+                                        />
+                                    )
+                                )}
 
                                 {/* Value on top of bars */}
                                 <LabelList
-                                    dataKey="salary"
+                                    dataKey="count"
                                     position="top"
                                     style={{ fontSize: 15, fontWeight: "600" }}
                                 />
