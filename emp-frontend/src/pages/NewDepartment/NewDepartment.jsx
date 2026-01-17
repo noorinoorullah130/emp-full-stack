@@ -127,14 +127,14 @@ const NewDepartment = () => {
     };
 
     // new useEffect for removing the isEditing and editingItem when unmount
-    // useEffect(() => {
-    //     return () => {
-    //         if (!loading) {
-    //             setIsEditing(false);
-    //             setEditingItem(false);
-    //         }
-    //     };
-    // }, [loading]);
+    useEffect(() => {
+        return () => {
+            if (!loading) {
+                setIsEditing(false);
+                setEditingItem(false);
+            }
+        };
+    }, [loading]);
 
     return (
         <div className="new-department">
