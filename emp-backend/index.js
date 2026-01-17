@@ -14,7 +14,9 @@ const directorateRoutes = require("./routes/directorate");
 const app = express();
 
 mongoose
-    .connect("mongodb://localhost:27017/employee-management")
+    .connect(
+        "mongodb+srv://emp-full-stack:emp-full-stack@cluster0.cesbq1d.mongodb.net/emp-full-stack",
+    )
     .then(() => console.log("MongoDB connected successfully!"))
     .catch((err) => console.log("MongoDB connection failed", err));
 
