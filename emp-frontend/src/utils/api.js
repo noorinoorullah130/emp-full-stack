@@ -2,7 +2,7 @@ import axios from "axios";
 import { getTokenAndRole } from "./auth";
 
 const api = axios.create({
-    baseURL: "http://localhost:5000/api",
+    baseURL: "https://emp-backend-mdoo.onrender.com",
 });
 
 api.interceptors.request.use(
