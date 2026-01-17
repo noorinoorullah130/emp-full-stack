@@ -68,11 +68,6 @@ const Dashboard = () => {
         fetchDashboardDetails();
     }, []);
 
-    const genderData = [
-        { name: "Male", value: 120 },
-        { name: "Female", value: 80 },
-    ];
-
     const COLORS = [
         "#6366f1",
         "#22c55e",
@@ -97,13 +92,6 @@ const Dashboard = () => {
         "#2563eb",
         "#34d399",
     ];
-
-    const GENDER_COLORS = {
-        Male: "#3b82f6", // Blue
-        Female: "#ec4899", // Pink
-    };
-
-    const renderLabel = ({ percent }) => `${(percent * 100).toFixed(0)}%`;
 
     return (
         <div className="dashboard">
@@ -645,37 +633,6 @@ const Dashboard = () => {
                                 />
                             </Bar>
                         </BarChart>
-                    </ResponsiveContainer>
-                </div>
-
-                {/* Employees by Directorate */}
-                <div className="main-chart">
-                    <h2>Employees Gender</h2>
-                    <ResponsiveContainer width="100%" height={380}>
-                        <PieChart width={350} height={300}>
-                            <Pie
-                                data={genderData}
-                                dataKey="value"
-                                nameKey="name"
-                                cx="50%"
-                                cy="50%"
-                                outerRadius={110}
-                                innerRadius={60}
-                                paddingAngle={3}
-                                label={renderLabel}
-                                labelLine={false}
-                            >
-                                {genderData.map((entry, index) => (
-                                    <Cell
-                                        key={`cell-${index}`}
-                                        fill={GENDER_COLORS[entry.name]}
-                                    />
-                                ))}
-                            </Pie>
-
-                            <Tooltip />
-                            <Legend verticalAlign="bottom" height={36} />
-                        </PieChart>
                     </ResponsiveContainer>
                 </div>
             </div>
