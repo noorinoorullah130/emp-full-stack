@@ -17,12 +17,8 @@ const AllUsers = () => {
     const [loading, setLoading] = useState(false);
     const [deleteId, setDeleteId] = useState(null);
 
-    const {
-        showConfirmationBox,
-        setShowConfirmationBox,
-        setIsEditing,
-        setEditingItem,
-    } = useContext(AppContext);
+    const { showConfirmationBox, setShowConfirmationBox, setEditingItem } =
+        useContext(AppContext);
 
     const navigate = useNavigate();
 
@@ -30,7 +26,7 @@ const AllUsers = () => {
         setLoading(true);
         try {
             const response = await api.get(
-                `/user?page=${currentPage}&limit=${limit}`
+                `/user?page=${currentPage}&limit=${limit}`,
             );
             const data = await response.data;
 
@@ -38,7 +34,7 @@ const AllUsers = () => {
             setTotalUsers(data.totalUsers);
         } catch (error) {
             toast.error(
-                error.response?.data.message || "Something went wrong!"
+                error.response?.data.message || "Something went wrong!",
             );
         } finally {
             setLoading(false);
@@ -66,7 +62,7 @@ const AllUsers = () => {
             await fetchAllUsers();
         } catch (error) {
             toast.error(
-                error.response?.data?.message || "Failed to delete user!"
+                error.response?.data?.message || "Failed to delete user!",
             );
         } finally {
             setLoading(false);
@@ -74,8 +70,12 @@ const AllUsers = () => {
     };
 
     const handleEdit = (user) => {
-        setIsEditing(true);
-        setEditingItem(user);
+        setEditingItem({
+            editDirectorate: null,
+            editUser: user,
+            editDepartment: null,
+            editEmployee: null,
+        });
         console.log(user);
         navigate("/app/newuser");
     };
@@ -120,7 +120,7 @@ const AllUsers = () => {
                                 <td>
                                     {formatText(
                                         user?.directorate?.dirName ||
-                                            "All Directorates"
+                                            "All Directorates",
                                     )}
                                 </td>
                                 <td>{formatText(user.role[0])}</td>

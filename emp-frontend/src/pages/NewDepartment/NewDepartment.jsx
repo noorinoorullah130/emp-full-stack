@@ -17,8 +17,9 @@ const NewDepartment = () => {
     const [allDirectorates, setAllDirectorates] = useState([]);
     const { role } = getTokenAndRole();
 
-    const { isEditing, setIsEditing, editingItem, setEditingItem } =
-        useContext(AppContext);
+    const { editingItem, setEditingItem } = useContext(AppContext);
+
+    let isEditing = Boolean(editingItem.editDepartment);
 
     // For Admin
     const fetchAllDirectoratesForNewDepartment = async () => {
@@ -27,15 +28,12 @@ const NewDepartment = () => {
             const response = await api.get("/user/directoratesfornewuser");
             const data = await response.data;
 
-            const options = data.map((dir) => {
-                return {
-                    label: formatText(dir.dirName),
-                    value: dir.dirName,
-                };
-            });
+            const options = data.map((dir) => ({
+                label: formatText(dir.dirName),
+                value: dir._id,
+            }));
+
             setAllDirectorates(options);
-            // console.log(data);
-            // console.log(options);
         } catch (error) {
             toast.error(error.response?.data?.message || "Something is wrong!");
             console.log(error.response);
@@ -45,19 +43,26 @@ const NewDepartment = () => {
     };
 
     useEffect(() => {
-        if (role === "admin" && !isEditing && !editingItem) {
+        if (role === "admin" && !isEditing && !editingItem.editDepartment) {
             fetchAllDirectoratesForNewDepartment();
         }
     }, [role]);
 
     useEffect(() => {
-        if (isEditing && editingItem) {
-            setDptForm({
-                dptName: editingItem.dptName,
-                dptManager: editingItem.dptManager,
-            });
-        }
-    }, [isEditing, editingItem]);
+        if (!editingItem.editDepartment) return;
+
+        console.log(editingItem.editDepartment);
+        setDptForm({
+            dptName: editingItem.editDepartment.dptName,
+            dptManager: editingItem.editDepartment.dptManager,
+            directorate: {
+                label: formatText(
+                    editingItem.editDepartment.directorate[0],
+                ),
+                value: editingItem.editDepartment.directorate._id,
+            },
+        });
+    }, [editingItem.editDepartment]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -77,31 +82,34 @@ const NewDepartment = () => {
             return;
         }
 
-        // Prepare the data
         const setData = {
             dptName: dptForm.dptName,
             dptManager: dptForm.dptManager,
-            directorate: dptForm?.directorate?.value,
+            directorate: dptForm.directorate?.value,
         };
 
         setLoading(true);
 
-        let response;
-
         try {
-            if (isEditing && editingItem) {
+            let response;
+
+            if (isEditing && editingItem.editDepartment) {
                 response = await api.put(
-                    `/department/${editingItem._id}`,
-                    setData
+                    `/department/${editingItem.editDepartment._id}`,
+                    setData,
                 );
-                setIsEditing(false);
-                setEditingItem(null);
+                isEditing = false;
+                setEditingItem({
+                    editDirectorate: null,
+                    editUser: null,
+                    editDepartment: null,
+                    editEmployee: null,
+                });
             } else {
                 response = await api.post("/department", setData);
             }
 
-            const data = await response.data;
-            toast.success(data?.message);
+            toast.success(response.data?.message);
 
             setDptForm({
                 dptName: "",
@@ -109,32 +117,28 @@ const NewDepartment = () => {
                 directorate: null,
             });
         } catch (error) {
-            toast.error(error.response?.data?.message || "Something is wrong!");
-            console.log(error.response);
+            toast.error(
+                error.response?.data?.message || "Something went wrong!",
+            );
         } finally {
             setLoading(false);
         }
     };
 
     const handleCancel = () => {
-        setIsEditing(false);
-        setEditingItem(null);
+        isEditing = false;
+        setEditingItem({
+            editDirectorate: null,
+            editUser: null,
+            editDepartment: null,
+            editEmployee: null,
+        });
         setDptForm({
             dptName: "",
             dptManager: "",
             directorate: null,
         });
     };
-
-    // new useEffect for removing the isEditing and editingItem when unmount
-    useEffect(() => {
-        return () => {
-            if (!loading) {
-                setIsEditing(false);
-                setEditingItem(false);
-            }
-        };
-    }, [loading]);
 
     return (
         <div className="new-department">

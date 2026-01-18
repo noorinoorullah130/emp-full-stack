@@ -8,17 +8,18 @@ const NewDirectorate = () => {
     const [dirForm, setDirForm] = useState({ dirCode: "", dirName: "" });
     const [loading, setLoading] = useState(false);
 
-    const { isEditing, setIsEditing, editingItem, setEditingItem } =
-        useContext(AppContext);
+    const { editingItem, setEditingItem } = useContext(AppContext);
+
+    let isEditing = Boolean(editingItem.editDirectorate);
 
     useEffect(() => {
-        if (isEditing && editingItem) {
-            setDirForm({
-                dirCode: editingItem.dirCode,
-                dirName: editingItem.dirName,
-            });
-        }
-    }, [isEditing, editingItem]);
+        if (!editingItem.editDirectorate) return;
+
+        setDirForm({
+            dirCode: editingItem.editDirectorate.dirCode,
+            dirName: editingItem.editDirectorate.dirName,
+        });
+    }, [editingItem.editDirectorate]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -37,13 +38,18 @@ const NewDirectorate = () => {
         let response;
 
         try {
-            if (isEditing && editingItem) {
+            if (isEditing && editingItem.editDirectorate) {
                 response = await api.put(
-                    `/directorate/${editingItem.dirId}`,
-                    dirForm
+                    `/directorate/${editingItem.editDirectorate.dirId}`,
+                    dirForm,
                 );
-                setIsEditing(false);
-                setEditingItem(null);
+                isEditing = false;
+                setEditingItem({
+                    editDirectorate: null,
+                    editUser: null,
+                    editDepartment: null,
+                    editEmployee: null,
+                });
             } else {
                 response = await api.post("/directorate", dirForm);
             }
@@ -52,7 +58,7 @@ const NewDirectorate = () => {
             setDirForm({ dirCode: "", dirName: "" });
         } catch (error) {
             toast.error(
-                error.response?.data?.message || "Something went wrong!"
+                error.response?.data?.message || "Something went wrong!",
             );
         } finally {
             setLoading(false);
@@ -60,20 +66,15 @@ const NewDirectorate = () => {
     };
 
     const handleCancel = () => {
-        setIsEditing(false);
-        setEditingItem(null);
+        isEditing = false;
+        setEditingItem({
+            editDirectorate: null,
+            editUser: null,
+            editDepartment: null,
+            editEmployee: null,
+        });
         setDirForm({ dirCode: "", dirName: "" });
     };
-
-    // new useEffect for removing the isEditing and editingItem when unmount
-    useEffect(() => {
-        return () => {
-            if (!loading) {
-                setIsEditing(false);
-                setEditingItem(false);
-            }
-        };
-    }, [loading]);
 
     return (
         <div className="new-directorate">

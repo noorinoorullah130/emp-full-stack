@@ -13,6 +13,8 @@ const directorateRoutes = require("./routes/directorate");
 
 const app = express();
 
+// "mongodb://localhost:27017/employee-management",
+
 mongoose
     .connect(
         "mongodb+srv://emp-full-stack:emp-full-stack@cluster0.cesbq1d.mongodb.net/emp-full-stack",

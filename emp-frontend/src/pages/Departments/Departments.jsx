@@ -20,22 +20,18 @@ const Departments = () => {
 
     const navigate = useNavigate();
 
-    const {
-        showConfirmationBox,
-        setShowConfirmationBox,
-        setIsEditing,
-        setEditingItem,
-    } = useContext(AppContext);
+    const { showConfirmationBox, setShowConfirmationBox, setEditingItem } =
+        useContext(AppContext);
 
     const fetchAllDepartments = async () => {
         setLoading(true);
         try {
             const response = await api.get(
-                `/department?page=${currentPage}&limit=${limit}`
+                `/department?page=${currentPage}&limit=${limit}`,
             );
 
             const data = await response.data;
-            console.log(data)
+            console.log(data);
 
             setAllDepartments(data.allDpts);
             setTotalDepartments(data.totalDpts);
@@ -68,7 +64,7 @@ const Departments = () => {
             await fetchAllDepartments();
         } catch (error) {
             toast.error(
-                error.response?.data?.message || "Failed to delete Department!"
+                error.response?.data?.message || "Failed to delete Department!",
             );
         } finally {
             setLoading(false);
@@ -76,8 +72,12 @@ const Departments = () => {
     };
 
     const handleEdit = (dept) => {
-        setIsEditing(true);
-        setEditingItem(dept);
+        setEditingItem({
+            editDirectorate: null,
+            editUser: null,
+            editDepartment: dept,
+            editEmployee: null,
+        });
         navigate("/app/newdepartment");
         console.log(dept);
     };
@@ -122,9 +122,7 @@ const Departments = () => {
                                 <td>{formatText(dept.dptManager)}</td>
                                 <td>{formatText(dept.directorate[0])}</td>
                                 <td>{dept.employeeCount}</td>
-                                <td>
-                                    {formatTotalSalary(dept.totalSalary)}
-                                </td>
+                                <td>{formatTotalSalary(dept.totalSalary)}</td>
                                 <td className="action-buttons">
                                     <button
                                         className="edit-btn"

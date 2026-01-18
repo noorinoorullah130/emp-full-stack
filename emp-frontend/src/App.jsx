@@ -7,14 +7,16 @@ import AppContext from "./context/AppContext";
 
 const App = () => {
     const [showConfirmationBox, setShowConfirmationBox] = useState(false);
-    const [isEditing, setIsEditing] = useState(false);
-    const [editingItem, setEditingItem] = useState(null);
+    const [editingItem, setEditingItem] = useState({
+        editDirectorate: null,
+        editUser: null,
+        editDepartment: null,
+        editEmployee: null,
+    });
 
     const value = {
         showConfirmationBox,
         setShowConfirmationBox,
-        isEditing,
-        setIsEditing,
         editingItem,
         setEditingItem,
     };

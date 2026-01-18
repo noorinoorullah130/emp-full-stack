@@ -19,12 +19,8 @@ const AllDirectorates = () => {
 
     const navigate = useNavigate();
 
-    const {
-        showConfirmationBox,
-        setShowConfirmationBox,
-        setIsEditing,
-        setEditingItem,
-    } = useContext(AppContext);
+    const { setEditingItem, showConfirmationBox, setShowConfirmationBox } =
+        useContext(AppContext);
 
     const getAllDirectoratesData = async () => {
         setLoading(true);
@@ -40,7 +36,7 @@ const AllDirectorates = () => {
             setTotalDirectorates(data.totalDirectorates);
         } catch (error) {
             toast.error(
-                error.response?.data?.message || "Failed to fetch data"
+                error.response?.data?.message || "Failed to fetch data",
             );
         } finally {
             setLoading(false);
@@ -51,13 +47,18 @@ const AllDirectorates = () => {
         getAllDirectoratesData();
     }, [currentPage, limit]);
 
-    const handleEdit = async (id, dir) => {
-        setIsEditing(true);
+    const handleEdit = (id, dir) => {
         setEditingItem({
-            dirId: id,
-            dirCode: dir.dirCode,
-            dirName: dir.dirName,
+            editDirectorate: {
+                dirId: id,
+                dirCode: dir.dirCode,
+                dirName: dir.dirName,
+            },
+            editUser: null,
+            editDepartment: null,
+            editEmployee: null,
         });
+
         navigate("/app/newdirectorate");
     };
 
@@ -78,7 +79,8 @@ const AllDirectorates = () => {
             await getAllDirectoratesData();
         } catch (error) {
             toast.error(
-                error.response?.data?.message || "Failed to delete directorate!"
+                error.response?.data?.message ||
+                    "Failed to delete directorate!",
             );
         } finally {
             setLoading(false);

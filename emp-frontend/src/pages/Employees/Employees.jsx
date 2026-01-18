@@ -14,12 +14,8 @@ import { useNavigate } from "react-router-dom";
 const Employees = () => {
     const { role } = getTokenAndRole();
 
-    const {
-        showConfirmationBox,
-        setShowConfirmationBox,
-        setIsEditing,
-        setEditingItem,
-    } = useContext(AppContext);
+    const { showConfirmationBox, setShowConfirmationBox, setEditingItem } =
+        useContext(AppContext);
 
     const navigate = useNavigate();
 
@@ -35,7 +31,7 @@ const Employees = () => {
 
         try {
             const response = await api.get(
-                `/employee?page=${currentPage}&limit=${limit}`
+                `/employee?page=${currentPage}&limit=${limit}`,
             );
             const data = response.data;
 
@@ -44,7 +40,7 @@ const Employees = () => {
             setTotalEmployees(data.totalEmployees);
         } catch (error) {
             toast.error(
-                error.response?.data?.message || "Something went wrong!"
+                error.response?.data?.message || "Something went wrong!",
             );
             console.log(error.response);
         } finally {
@@ -83,9 +79,12 @@ const Employees = () => {
     };
 
     const handleEdit = (emp) => {
-        console.log(emp);
-        setIsEditing(true);
-        setEditingItem(emp);
+        setEditingItem({
+            editDirectorate: null,
+            editUser: null,
+            editDepartment: null,
+            editEmployee: emp,
+        });
         navigate("/app/newemployee");
     };
 

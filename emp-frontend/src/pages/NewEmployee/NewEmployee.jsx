@@ -20,8 +20,9 @@ import { allGrades, allSteps } from "../../utils/selectOptions";
 const NewEmployee = () => {
     const { role, directorate, directorateId } = getTokenAndRole();
 
-    const { isEditing, setIsEditing, editingItem, setEditingItem } =
-        useContext(AppContext);
+    const { editingItem, setEditingItem } = useContext(AppContext);
+
+    let isEditing = Boolean(editingItem.editEmployee);
 
     const [empForm, setEmpForm] = useState({
         name: "",
@@ -71,7 +72,7 @@ const NewEmployee = () => {
             setAllDirectorates(options);
         } catch (error) {
             toast.error(
-                error.response?.data?.message || "Something went wrong!"
+                error.response?.data?.message || "Something went wrong!",
             );
         } finally {
             setLoading(false);
@@ -89,7 +90,7 @@ const NewEmployee = () => {
         setLoading(true);
         try {
             const response = await api.get(
-                `/employee/departmentsfornewemployee?directorateId=${dirId}`
+                `/employee/departmentsfornewemployee?directorateId=${dirId}`,
             );
             const data = response.data;
             const options = data.map((dpt) => ({
@@ -100,7 +101,7 @@ const NewEmployee = () => {
             setAllDepartments(options);
         } catch (error) {
             toast.error(
-                error.response?.data?.message || "Something went wrong!"
+                error.response?.data?.message || "Something went wrong!",
             );
         } finally {
             setLoading(false);
@@ -115,26 +116,26 @@ const NewEmployee = () => {
 
     // EDITING EXSITING EMPLOYEE
     useEffect(() => {
-        if ((isEditing, editingItem)) {
-            setEmpForm({
-                name: editingItem.name,
-                fName: editingItem.fName,
-                grade: {
-                    value: editingItem.grade,
-                    label: formatText(editingItem.grade),
-                },
-                step: {
-                    value: editingItem.step,
-                    label: formatText(editingItem.step),
-                },
-                experience: editingItem.experience,
-                idNumber: editingItem.idNumber,
-                directorate: editingItem.directorate,
-                department: editingItem.department,
-                hireDate: dayjs(editingItem.hireDate),
-            });
-        }
-    }, [isEditing, editingItem]);
+        if (!editingItem.editEmployee) return;
+
+        setEmpForm({
+            name: editingItem.editEmployee.name,
+            fName: editingItem.editEmployee.fName,
+            grade: {
+                value: editingItem.editEmployee.grade,
+                label: formatText(editingItem.editEmployee.grade),
+            },
+            step: {
+                value: editingItem.editEmployee.step,
+                label: formatText(editingItem.editEmployee.step),
+            },
+            experience: editingItem.editEmployee.experience,
+            idNumber: editingItem.editEmployee.idNumber,
+            directorate: editingItem.editEmployee.directorate,
+            department: editingItem.editEmployee.department,
+            hireDate: dayjs(editingItem.editEmployee.hireDate),
+        });
+    }, [editingItem.editEmployee]);
 
     // ====== Handlers ======
     const handleInputChange = (e) => {
@@ -216,14 +217,19 @@ const NewEmployee = () => {
         let response;
 
         try {
-            if (isEditing && editingItem) {
+            if (isEditing && editingItem.editEmployee) {
                 response = await api.put(
-                    `/employee/${editingItem._id}`,
-                    preparedData
+                    `/employee/${editingItem.editEmployee._id}`,
+                    preparedData,
                 );
 
-                setIsEditing(false);
-                setEditingItem(null);
+                isEditing = false;
+                setEditingItem({
+                    editDirectorate: null,
+                    editUser: null,
+                    editDepartment: null,
+                    editEmployee: null,
+                });
             } else {
                 response = await api.post("employee", preparedData);
             }
@@ -251,7 +257,7 @@ const NewEmployee = () => {
             });
         } catch (error) {
             toast.error(
-                error.response?.data?.message || "Something went wrong!"
+                error.response?.data?.message || "Something went wrong!",
             );
         } finally {
             setLoading(false);
@@ -259,8 +265,13 @@ const NewEmployee = () => {
     };
 
     const handleCancel = () => {
-        setIsEditing(false);
-        setEditingItem(null);
+        isEditing = false;
+        setEditingItem({
+            editDirectorate: null,
+            editUser: null,
+            editDepartment: null,
+            editEmployee: null,
+        });
         setEmpForm({
             name: "",
             fName: "",
@@ -280,16 +291,6 @@ const NewEmployee = () => {
             hireDate: null,
         });
     };
-
-    // new useEffect for removing the isEditing and editingItem when unmount
-    useEffect(() => {
-        return () => {
-            if (!loading) {
-                setIsEditing(false);
-                setEditingItem(false);
-            }
-        };
-    }, [loading]);
 
     return (
         <div className="new-employee">

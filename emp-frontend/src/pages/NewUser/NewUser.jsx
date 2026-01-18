@@ -19,8 +19,9 @@ const NewUser = () => {
     const [allDirectorates, setAllDirectorates] = useState([]);
     const [loading, setLoading] = useState(false);
 
-    const { isEditing, setIsEditing, editingItem, setEditingItem } =
-        useContext(AppContext);
+    const { editingItem, setEditingItem } = useContext(AppContext);
+
+    let isEditing = Boolean(editingItem.editUser);
 
     const fetchDirectoratesForNewUser = async () => {
         setLoading(true);
@@ -35,7 +36,7 @@ const NewUser = () => {
             setAllDirectorates(options);
         } catch (error) {
             toast.error(
-                error.response?.data.message || "Error fetching directorates"
+                error.response?.data.message || "Error fetching directorates",
             );
         } finally {
             setLoading(false);
@@ -43,21 +44,21 @@ const NewUser = () => {
     };
 
     useEffect(() => {
-        if (isEditing && editingItem) {
-            setUserForm({
-                name: editingItem.name,
-                email: editingItem.email,
-                role: {
-                    value: editingItem.role[0],
-                    label: formatText(editingItem.role[0]),
-                },
-                directorate: {
-                    value: editingItem.directorate,
-                    label: formatText(editingItem.directorate),
-                },
-            });
-        }
-    }, [isEditing, editingItem]);
+        if (!editingItem.editUser) return;
+
+        setUserForm({
+            name: editingItem.editUser.name,
+            email: editingItem.editUser.email,
+            role: {
+                value: editingItem.editUser.role[0],
+                label: formatText(editingItem.editUser.role[0]),
+            },
+            directorate: {
+                value: editingItem.editUser.directorate.dirName,
+                label: formatText(editingItem.editUser.directorate.dirName),
+            },
+        });
+    }, [editingItem.editUser]);
 
     useEffect(() => {
         fetchDirectoratesForNewUser();
@@ -108,22 +109,27 @@ const NewUser = () => {
                 directorate: userForm.directorate.value,
             };
 
-            if (isEditing && editingItem) {
+            if (isEditing && editingItem.editUser) {
                 response = await api.put(
-                    `/user/${editingItem._id}`,
-                    submitData
+                    `/user/${editingItem.editUser._id}`,
+                    submitData,
                 );
-                setIsEditing(false);
-                setEditingItem(null);
+                isEditing = false;
+                setEditingItem({
+                    editDirectorate: null,
+                    editUser: null,
+                    editDepartment: null,
+                    editEmployee: null,
+                });
             } else {
                 if (!userForm.password) {
                     toast.error(
-                        "Please fill all required fields with valid data!"
+                        "Please fill all required fields with valid data!",
                     );
                     return;
                 }
-                (submitData.password = userForm.password),
-                    (response = await api.post("/user", submitData));
+                ((submitData.password = userForm.password),
+                    (response = await api.post("/user", submitData)));
             }
 
             const data = await response.data;
@@ -140,7 +146,7 @@ const NewUser = () => {
         } catch (error) {
             toast.error(
                 error.response?.data?.message ||
-                    "Error creating user. Please try again."
+                    "Error creating user. Please try again.",
             );
         } finally {
             setLoading(false);
@@ -148,8 +154,13 @@ const NewUser = () => {
     };
 
     const handleCancel = () => {
-        setIsEditing(false);
-        setEditingItem(null);
+        isEditing = false;
+        setEditingItem({
+            editDirectorate: null,
+            editUser: null,
+            editDepartment: null,
+            editEmployee: null,
+        });
         setUserForm({
             name: "",
             email: "",
@@ -158,16 +169,6 @@ const NewUser = () => {
             directorate: null,
         });
     };
-
-    // new useEffect for removing the isEditing and editingItem when unmount
-    useEffect(() => {
-        return () => {
-            if (!loading) {
-                setIsEditing(false);
-                setEditingItem(false);
-            }
-        };
-    }, [loading]);
 
     return (
         <div className="new-user">

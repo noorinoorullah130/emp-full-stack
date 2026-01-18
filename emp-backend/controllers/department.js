@@ -96,7 +96,7 @@ const getAllDpts = async (req, res) => {
                   {
                       $match: {
                           directorate: new mongoose.Types.ObjectId(
-                              req.user.directorate
+                              req.user.directorate,
                           ),
                       },
                   },
@@ -154,39 +154,46 @@ const getAllDpts = async (req, res) => {
 
 const updateDpt = async (req, res) => {
     try {
-        const { dptName, dptManager } = req.body;
-
+        const { dptName, dptManager, directorate } = req.body;
         const id = req.params.id;
 
         const department = await Department.findById(id);
+        if (!department) {
+            return res.status(404).json({
+                message: `Department with id(${id}) not found!`,
+            });
+        }
 
-        if (!department)
-            return res
-                .status(404)
-                .json({ message: `Department with id(${id}) not found!` });
-
+        // Check duplicate ONLY inside same directorate
         if (dptName) {
             const isDptExisted = await Department.findOne({
-                dptName: dptName,
+                dptName,
+                directorate: directorate || department.directorate,
                 _id: { $ne: id },
             });
 
-            if (isDptExisted)
-                return res
-                    .status(400)
-                    .json({ message: "Department already existed!" });
+            if (isDptExisted) {
+                return res.status(400).json({
+                    message:
+                        "Department with this name already exists in this directorate!",
+                });
+            }
         }
 
         const updatedDpt = await Department.findByIdAndUpdate(
             id,
             {
-                $set: { dptName, dptManager },
+                $set: {
+                    dptName,
+                    dptManager,
+                    directorate: directorate || department.directorate,
+                },
             },
-            { new: true, runValidators: true }
+            { new: true, runValidators: true },
         );
 
         res.status(200).json({
-            message: `Department with id(${id}) successfully edited!`,
+            message: "Department successfully updated!",
             updatedDpt,
         });
     } catch (error) {
